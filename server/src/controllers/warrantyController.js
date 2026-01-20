@@ -174,3 +174,43 @@ export const deleteWarranty = async (req, res) => {
         });
     }
 };
+
+// @desc    Upload invoice for a warranty
+// @route   POST /api/warranties/:id/invoice
+// @access  Private
+export const uploadInvoice = async (req, res) => {
+    try {
+        const warranty = await Warranty.findOne({
+            _id: req.params.id,
+            user: req.user._id
+        });
+
+        if (!warranty) {
+            return res.status(404).json({
+                success: false,
+                message: "Warranty not found"
+            });
+        }
+
+        if (!req.file || !req.file.path) {
+            return res.status(400).json({
+                success: false,
+                message: "Invoice file is required"
+            });
+        }
+
+        warranty.invoiceUrl = req.file.path;
+        await warranty.save();
+
+        res.json({
+            success: true,
+            message: "Invoice uploaded successfully",
+            invoiceUrl: warranty.invoiceUrl
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to upload invoice"
+        });
+    }
+};

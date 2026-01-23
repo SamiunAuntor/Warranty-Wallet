@@ -1,19 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../Firebase/AuthProvider";
-import { signOut } from "firebase/auth";
-import { auth } from "../Firebase/firebase.config";
-import toast from "react-hot-toast";
 
 const Navbar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      toast.success("Logged out successfully");
-    } catch (error) {
-      toast.error("Error logging out");
-      console.error(error);
+    const result = await logout();
+    if (result.success) {
+      navigate("/");
     }
   };
 
@@ -29,6 +24,12 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
+                <Link
+                  to="/dashboard"
+                  className="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-lg transition"
+                >
+                  Dashboard
+                </Link>
                 <span className="text-gray-700">
                   {user.displayName || user.email}
                 </span>

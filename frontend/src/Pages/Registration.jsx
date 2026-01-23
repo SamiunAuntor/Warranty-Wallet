@@ -1,18 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "firebase/auth";
-import { auth } from "../Firebase/firebase.config";
-import toast from "react-hot-toast";
 import Navbar from "../Components/Navbar";
-import { registerUserInDB } from "../utils/api";
+import { useAuth } from "../Firebase/AuthProvider";
 
 const Registration = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  
+  const { registerWithEmail, loginWithGoogle, authLoading } = useAuth();
 
   const handleEmailRegistration = async (e) => {
     e.preventDefault();
@@ -27,40 +25,16 @@ const Registration = () => {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCredential.user, {
-        displayName: name,
-      });
-      // Register user in MongoDB
-      await registerUserInDB(userCredential.user);
-      toast.success("Account created successfully");
+    const result = await registerWithEmail(email, password, name);
+    if (result.success) {
       navigate("/dashboard");
-    } catch (error) {
-      toast.error(error.message || "Registration failed");
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleGoogleRegistration = async () => {
-    setLoading(true);
-    const provider = new GoogleAuthProvider();
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      // Register user in MongoDB
-      await registerUserInDB(result.user);
-      toast.success("Account created with Google successfully");
+    const result = await loginWithGoogle();
+    if (result.success) {
       navigate("/dashboard");
-    } catch (error) {
-      toast.error(error.message || "Google registration failed");
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -81,7 +55,8 @@ const Registration = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={authLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 placeholder="Enter your full name"
               />
             </div>
@@ -94,7 +69,8 @@ const Registration = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={authLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 placeholder="Enter your email"
               />
             </div>
@@ -107,7 +83,8 @@ const Registration = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={authLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 placeholder="Enter your password"
               />
             </div>
@@ -120,16 +97,17 @@ const Registration = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={authLoading}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 placeholder="Confirm your password"
               />
             </div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={authLoading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition disabled:opacity-50"
             >
-              {loading ? "Creating Account..." : "Register"}
+              {authLoading ? "Creating Account..." : "Register"}
             </button>
           </form>
 
@@ -144,7 +122,7 @@ const Registration = () => {
             </div>
             <button
               onClick={handleGoogleRegistration}
-              disabled={loading}
+              disabled={authLoading}
               className="mt-4 w-full bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 py-2 rounded-lg font-semibold transition flex items-center justify-center space-x-2 disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

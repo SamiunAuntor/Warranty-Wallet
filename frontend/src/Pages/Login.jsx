@@ -1,73 +1,38 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../Firebase/firebase.config";
-import toast from "react-hot-toast";
 import Navbar from "../Components/Navbar";
-import { registerUserInDB } from "../utils/api";
+import { useAuth } from "../Firebase/AuthProvider";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const navigate = useNavigate();
+  
+  const { loginWithEmail, loginWithGoogle, resetPassword, authLoading } = useAuth();
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      toast.success("Logged in successfully");
+    const result = await loginWithEmail(email, password);
+    if (result.success) {
       navigate("/dashboard");
-    } catch (error) {
-      toast.error(error.message || "Login failed");
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setLoading(true);
-    const provider = new GoogleAuthProvider();
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      // Register user in MongoDB if not already registered
-      try {
-        await registerUserInDB(result.user);
-      } catch (dbError) {
-        // User might already exist, which is fine
-        console.log("User registration check:", dbError);
-      }
-      toast.success("Logged in with Google successfully");
+    const result = await loginWithGoogle();
+    if (result.success) {
       navigate("/dashboard");
-    } catch (error) {
-      toast.error(error.message || "Google login failed");
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    if (!resetEmail) {
-      toast.error("Please enter your email");
-      return;
-    }
-
-    try {
-      await sendPasswordResetEmail(auth, resetEmail);
-      toast.success("Password reset email sent! Check your inbox.");
+    const result = await resetPassword(resetEmail);
+    if (result.success) {
       setShowForgotPassword(false);
       setResetEmail("");
-    } catch (error) {
-      toast.error(error.message || "Failed to send reset email");
-      console.error(error);
     }
   };
 
@@ -90,7 +55,8 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={authLoading}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Enter your email"
                   />
                 </div>
@@ -103,23 +69,25 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={authLoading}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="Enter your password"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowForgotPassword(true)}
-                  className="text-sm text-blue-600 hover:underline"
+                  disabled={authLoading}
+                  className="text-sm text-blue-600 hover:underline disabled:opacity-50"
                 >
                   Forgot Password?
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition disabled:opacity-50"
+                  disabled={authLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? "Logging in..." : "Login"}
+                  {authLoading ? "Logging in..." : "Login"}
                 </button>
               </form>
 
@@ -134,7 +102,7 @@ const Login = () => {
                 </div>
                 <button
                   onClick={handleGoogleLogin}
-                  disabled={loading}
+                  disabled={authLoading}
                   className="mt-4 w-full bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 py-2 rounded-lg font-semibold transition flex items-center justify-center space-x-2 disabled:opacity-50"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -179,7 +147,8 @@ const Login = () => {
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={authLoading}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                     placeholder="Enter your email"
                   />
                 </div>
@@ -190,15 +159,17 @@ const Login = () => {
                       setShowForgotPassword(false);
                       setResetEmail("");
                     }}
-                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-semibold transition"
+                    disabled={authLoading}
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-semibold transition disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition"
+                    disabled={authLoading}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition disabled:opacity-50"
                   >
-                    Send Reset Email
+                    {authLoading ? "Sending..." : "Send Reset Email"}
                   </button>
                 </div>
               </form>
@@ -211,4 +182,3 @@ const Login = () => {
 };
 
 export default Login;
-

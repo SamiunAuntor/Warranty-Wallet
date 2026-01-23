@@ -2,7 +2,9 @@ import { createBrowserRouter } from "react-router-dom";
 import HomePage from "./Pages/HomePage";
 import Login from "./Pages/Login";
 import Registration from "./Pages/Registration";
+import Dashboard from "./Pages/Dashboard";
 import PrivateRoute from "./Components/PrivateRoute";
+import PublicRoute from "./Components/PublicRoute";
 
 const router = createBrowserRouter([
   {
@@ -11,17 +13,25 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    ),
   },
   {
     path: "/registration",
-    element: <Registration />,
+    element: (
+      <PublicRoute>
+        <Registration />
+      </PublicRoute>
+    ),
   },
   {
     path: "/dashboard",
     element: (
       <PrivateRoute>
-        <div>Dashboard - Coming Soon</div>
+        <Dashboard />
       </PrivateRoute>
     ),
   },

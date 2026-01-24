@@ -5,7 +5,7 @@ const Footer = () => {
   const { user } = useAuth();
 
   return (
-    <footer className="bg-white border-t-2 border-primary/20">
+    <footer className="bg-white">
       <div className="w-11/12 max-w-7xl mx-auto py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand Section */}
@@ -74,9 +74,11 @@ const Footer = () => {
             </ul>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-primary/10">
+      {/* Bottom Bar - Full Width */}
+      <div className="w-full border-t border-primary/10">
+        <div className="w-11/12 max-w-7xl mx-auto pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-600 text-sm text-center md:text-left">
               © {new Date().getFullYear()} Warranty Wallet. All rights reserved.

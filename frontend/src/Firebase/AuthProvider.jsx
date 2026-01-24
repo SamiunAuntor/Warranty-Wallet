@@ -117,24 +117,27 @@ const AuthProvider = ({ children }) => {
         return { success: false, error: "Password must be at least 6 characters" };
       }
 
-      // Upload profile image if provided
+      // STEP 1: Upload profile image FIRST (if provided) before creating account
       let photoURL = null;
       if (profileImage) {
         try {
           toast.loading("Uploading profile image...");
           photoURL = await uploadImageToImgBB(profileImage);
           toast.dismiss();
+          toast.success("Profile image uploaded successfully");
         } catch (uploadError) {
           console.error("Image upload error:", uploadError);
           toast.dismiss();
-          toast.error("Failed to upload profile image. Continuing without image...");
-          // Continue registration even if image upload fails
+          const errorMessage = uploadError.message || "Failed to upload profile image";
+          toast.error(errorMessage);
+          return { success: false, error: errorMessage };
         }
       }
 
+      // STEP 2: Create Firebase account only after image upload succeeds (or if no image)
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Update profile with display name and photo URL
+      // STEP 3: Update Firebase profile with display name and photo URL
       const profileUpdates = {};
       if (displayName) {
         profileUpdates.displayName = displayName;
@@ -147,7 +150,7 @@ const AuthProvider = ({ children }) => {
         await updateProfile(userCredential.user, profileUpdates);
       }
 
-      // Register user in MongoDB (with photoURL from upload or Firebase)
+      // STEP 4: Register user in MongoDB with all data (including photoURL)
       try {
         await registerUserInDB(userCredential.user, photoURL || userCredential.user.photoURL);
         toast.success("Account created successfully");

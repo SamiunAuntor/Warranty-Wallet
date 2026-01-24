@@ -126,6 +126,7 @@ VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
 VITE_FIREBASE_APP_ID=your_firebase_app_id
 VITE_API_URL=http://localhost:5000/api
+VITE_IMGBB_KEY=d7d5093bc6d1e1f0c823f249b8b7b76d
 ```
 
 4. Start the development server:
@@ -152,6 +153,7 @@ The frontend will run on `http://localhost:5173`
 - `VITE_FIREBASE_MESSAGING_SENDER_ID`: Firebase messaging sender ID
 - `VITE_FIREBASE_APP_ID`: Firebase app ID
 - `VITE_API_URL`: Backend API URL
+- `VITE_IMGBB_KEY`: ImgBB API key for image uploads
 
 ## API Endpoints
 

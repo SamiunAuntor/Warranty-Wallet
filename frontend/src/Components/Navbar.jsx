@@ -13,29 +13,29 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-blue-600">
+    <nav className="bg-parrot-green-50/80 backdrop-blur-md border-b border-primary/10 sticky top-0 z-50">
+      <div className="w-11/12 mx-auto">
+        <div className="flex justify-between items-center py-3.5">
+          {/* Left: Brand Name */}
+          <Link to="/" className="flex items-center group">
+            <span className="text-2xl font-bold text-primary group-hover:text-primary-dark transition-colors">
               Warranty Wallet
-            </Link>
-          </div>
-          <div className="flex items-center space-x-4">
+            </span>
+          </Link>
+          
+          {/* Right: Auth Buttons */}
+          <div className="flex items-center space-x-3">
             {user ? (
               <>
                 <Link
                   to="/dashboard"
-                  className="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-lg transition"
+                  className="text-gray-700 hover:text-primary px-4 py-2 rounded-lg transition-colors font-medium"
                 >
                   Dashboard
                 </Link>
-                <span className="text-gray-700">
-                  {user.displayName || user.email}
-                </span>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
+                  className="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-xl transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
                 >
                   Logout
                 </button>
@@ -44,13 +44,13 @@ const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-gray-700 hover:text-blue-600 px-4 py-2 rounded-lg transition"
+                  className="bg-white/90 hover:bg-white text-gray-700 hover:text-primary px-4 py-2 rounded-lg transition-colors font-medium border border-gray-200 shadow-sm"
                 >
                   Login
                 </Link>
                 <Link
                   to="/registration"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+                  className="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-xl transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
                 >
                   Register
                 </Link>

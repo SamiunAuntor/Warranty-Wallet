@@ -44,17 +44,26 @@ router.post("/register", async (req, res) => {
     // Get additional user info from Firebase Admin
     let displayName = null;
     let photoURL = null;
+    let providerId = "password"; // default
+    
     try {
       const userRecord = await admin.auth().getUser(uid);
       displayName = userRecord.displayName || null;
       photoURL = userRecord.photoURL || null;
+      
+      // Get provider ID (google.com, password, etc.)
+      if (userRecord.providerData && userRecord.providerData.length > 0) {
+        providerId = userRecord.providerData[0].providerId;
+      }
     } catch (error) {
       console.log("Could not fetch user details from Firebase Admin:", error);
     }
 
-    // Also check request body for displayName and photoURL (in case of updates)
-    if (req.body.displayName) displayName = req.body.displayName;
-    if (req.body.photoURL) photoURL = req.body.photoURL;
+    // Override with request body values if provided (for image uploads, etc.)
+    if (req.body.displayName !== undefined) displayName = req.body.displayName;
+    if (req.body.photoURL !== undefined) photoURL = req.body.photoURL;
+    if (req.body.providerId !== undefined) providerId = req.body.providerId;
+    if (req.body.email !== undefined) email = req.body.email;
 
     if (!uid || !email) {
       return res.status(400).json({ error: "UID and email are required" });
@@ -63,33 +72,41 @@ router.post("/register", async (req, res) => {
     const db = getDatabase();
     const usersCollection = db.collection("users");
 
-    // Check if user already exists
-    const existingUser = await usersCollection.findOne({ uid });
-
-    if (existingUser) {
-      return res.status(200).json({
-        message: "User already exists",
-        user: existingUser,
-      });
-    }
-
-    // Create new user
-    const newUser = {
+    // Prepare user data with all credentials
+    const userData = {
       uid,
       email,
       displayName: displayName,
       photoURL: photoURL,
-      createdAt: new Date(),
+      providerId: providerId,
       updatedAt: new Date(),
       role: "user",
       status: "active",
     };
 
-    await usersCollection.insertOne(newUser);
+    // Use upsert to prevent duplication - creates if doesn't exist, updates if exists
+    const result = await usersCollection.findOneAndUpdate(
+      { uid: uid }, // Find by uid
+      {
+        $set: userData,
+        $setOnInsert: {
+          createdAt: new Date(), // Only set on insert, not on update
+        },
+      },
+      {
+        upsert: true, // Create if doesn't exist
+        returnDocument: "after", // Return the updated/created document
+      }
+    );
 
-    res.status(201).json({
-      message: "User registered successfully",
-      user: newUser,
+    const user = result.value;
+
+    // Determine if this was a new user or existing user
+    const isNewUser = !result.lastErrorObject?.updatedExisting;
+
+    res.status(isNewUser ? 201 : 200).json({
+      message: isNewUser ? "User registered successfully" : "User already exists, profile updated",
+      user: user,
     });
   } catch (error) {
     console.error("Error registering user:", error);

@@ -8,8 +8,35 @@ const getAuthToken = async (user) => {
   return await user.getIdToken();
 };
 
+// Upload image to ImgBB
+export const uploadImageToImgBB = async (imageFile) => {
+  const apiKey = import.meta.env.VITE_IMGBB_KEY;
+  
+  if (!apiKey) {
+    throw new Error("ImgBB API key is not configured");
+  }
+
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  const url = `https://api.imgbb.com/1/upload?key=${apiKey}`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    return data.data.url;
+  } else {
+    throw new Error(data.error?.message || "Image upload failed");
+  }
+};
+
 // Register user in MongoDB
-export const registerUserInDB = async (user) => {
+export const registerUserInDB = async (user, photoURLOverride = null) => {
   try {
     const token = await getAuthToken(user);
     const response = await fetch(`${API_URL}/auth/register`, {
@@ -20,7 +47,9 @@ export const registerUserInDB = async (user) => {
       },
       body: JSON.stringify({
         displayName: user.displayName,
-        photoURL: user.photoURL,
+        photoURL: photoURLOverride || user.photoURL,
+        email: user.email,
+        providerId: user.providerData?.[0]?.providerId || "password",
       }),
     });
 

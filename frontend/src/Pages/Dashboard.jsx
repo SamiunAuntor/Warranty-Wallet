@@ -2,6 +2,7 @@ import { useAuth } from "../Firebase/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -47,12 +48,12 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-blue-50 p-6 rounded-lg">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+              <div className="bg-primary/10 p-6 rounded-lg border border-primary/20">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   Total Warranties
                 </h3>
-                <p className="text-3xl font-bold text-blue-600">0</p>
-                <p className="text-sm text-blue-700 mt-2">No warranties yet</p>
+                <p className="text-3xl font-bold text-primary">0</p>
+                <p className="text-sm text-gray-600 mt-2">No warranties yet</p>
               </div>
 
               <div className="bg-green-50 p-6 rounded-lg">
@@ -77,7 +78,7 @@ const Dashboard = () => {
                 Quick Actions
               </h3>
               <div className="flex flex-wrap gap-4">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition">
+                <button className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg font-semibold transition shadow-md hover:shadow-lg">
                   Add Warranty
                 </button>
                 <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-semibold transition">
@@ -91,6 +92,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

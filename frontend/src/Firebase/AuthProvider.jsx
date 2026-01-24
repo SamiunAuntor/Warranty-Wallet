@@ -10,7 +10,7 @@ import {
   updateProfile
 } from "firebase/auth";
 import { auth } from "./firebase.config";
-import { registerUserInDB } from "../utils/api";
+import { registerUserInDB, uploadImageToImgBB } from "../utils/api";
 import toast from "react-hot-toast";
 
 // Create Auth Context
@@ -104,7 +104,7 @@ const AuthProvider = ({ children }) => {
   };
 
   // Email/Password Registration
-  const registerWithEmail = async (email, password, displayName) => {
+  const registerWithEmail = async (email, password, displayName, profileImage = null) => {
     setAuthLoading(true);
     try {
       if (!auth) {
@@ -117,18 +117,39 @@ const AuthProvider = ({ children }) => {
         return { success: false, error: "Password must be at least 6 characters" };
       }
 
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      // Update profile with display name
-      if (displayName) {
-        await updateProfile(userCredential.user, {
-          displayName: displayName,
-        });
+      // Upload profile image if provided
+      let photoURL = null;
+      if (profileImage) {
+        try {
+          toast.loading("Uploading profile image...");
+          photoURL = await uploadImageToImgBB(profileImage);
+          toast.dismiss();
+        } catch (uploadError) {
+          console.error("Image upload error:", uploadError);
+          toast.dismiss();
+          toast.error("Failed to upload profile image. Continuing without image...");
+          // Continue registration even if image upload fails
+        }
       }
 
-      // Register user in MongoDB
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Update profile with display name and photo URL
+      const profileUpdates = {};
+      if (displayName) {
+        profileUpdates.displayName = displayName;
+      }
+      if (photoURL) {
+        profileUpdates.photoURL = photoURL;
+      }
+      
+      if (Object.keys(profileUpdates).length > 0) {
+        await updateProfile(userCredential.user, profileUpdates);
+      }
+
+      // Register user in MongoDB (with photoURL from upload or Firebase)
       try {
-        await registerUserInDB(userCredential.user);
+        await registerUserInDB(userCredential.user, photoURL || userCredential.user.photoURL);
         toast.success("Account created successfully");
         return { success: true, user: userCredential.user };
       } catch (dbError) {

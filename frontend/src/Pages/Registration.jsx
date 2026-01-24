@@ -14,9 +14,28 @@ const Registration = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   
   const { registerWithEmail, loginWithGoogle, authLoading } = useAuth();
+
+  // Password validation function
+  const validatePassword = (pwd) => {
+    const errors = [];
+    if (pwd.length < 6) {
+      errors.push("Password must be at least 6 characters");
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      errors.push("Password must contain at least one uppercase letter");
+    }
+    if (!/[a-z]/.test(pwd)) {
+      errors.push("Password must contain at least one lowercase letter");
+    }
+    if (!/[0-9]/.test(pwd)) {
+      errors.push("Password must contain at least one number");
+    }
+    return errors;
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -48,20 +67,56 @@ const Registration = () => {
 
   const handleEmailRegistration = async (e) => {
     e.preventDefault();
+    const newErrors = {};
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+    // Validate name
+    if (!name.trim()) {
+      newErrors.name = "Full name is required";
+    }
+
+    // Validate email
+    if (!email.trim()) {
+      newErrors.email = "Email address is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Validate password
+    const passwordErrors = validatePassword(password);
+    if (passwordErrors.length > 0) {
+      newErrors.password = passwordErrors[0]; // Show first error
+    }
+
+    // Validate confirm password
+    if (!confirmPassword.trim()) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    // If there are errors, set them and return
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
+    // Clear errors if validation passes
+    setErrors({});
 
     const result = await registerWithEmail(email, password, name, profileImage);
     if (result.success) {
       navigate("/dashboard");
+    } else {
+      // Handle registration errors
+      if (result.error) {
+        if (result.error.includes("email")) {
+          setErrors({ email: result.error });
+        } else if (result.error.includes("password")) {
+          setErrors({ password: result.error });
+        } else {
+          setErrors({ general: result.error });
+        }
+      }
     }
   };
 
@@ -134,48 +189,71 @@ const Registration = () => {
             </div>
 
             <form onSubmit={handleEmailRegistration} className="space-y-5">
+              {errors.general && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm text-red-600">{errors.general}</p>
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Full Name
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (errors.name) setErrors({ ...errors, name: null });
+                  }}
                   required
                   disabled={authLoading}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all disabled:opacity-50"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-primary transition-all disabled:opacity-50 outline-none ${
+                    errors.name ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                  }`}
                   placeholder="John Doe"
                 />
+                {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name}</p>}
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email Address
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors({ ...errors, email: null });
+                  }}
                   required
                   disabled={authLoading}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all disabled:opacity-50"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-primary transition-all disabled:opacity-50 outline-none ${
+                    errors.email ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                  }`}
                   placeholder="you@example.com"
                 />
+                {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errors.password) setErrors({ ...errors, password: null });
+                    }}
                     required
                     disabled={authLoading}
-                    className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all disabled:opacity-50"
+                    className={`w-full px-4 py-3 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-primary transition-all disabled:opacity-50 outline-none ${
+                      errors.password ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                    }`}
                     placeholder="••••••••"
                   />
                   <button
@@ -196,20 +274,26 @@ const Registration = () => {
                     )}
                   </button>
                 </div>
+                {errors.password && <p className="text-sm text-red-600 mt-1">{errors.password}</p>}
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Confirm Password
+                  Confirm Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: null });
+                    }}
                     required
                     disabled={authLoading}
-                    className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all disabled:opacity-50"
+                    className={`w-full px-4 py-3 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-primary transition-all disabled:opacity-50 outline-none ${
+                      errors.confirmPassword ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                    }`}
                     placeholder="••••••••"
                   />
                   <button
@@ -230,6 +314,7 @@ const Registration = () => {
                     )}
                   </button>
                 </div>
+                {errors.confirmPassword && <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>}
               </div>
 
               {/* Profile Image Upload - Optional, at bottom */}
@@ -256,37 +341,34 @@ const Registration = () => {
                     <p className="text-sm text-gray-500">Click to change</p>
                   </div>
                 ) : (
-                  <div>
-                    <label className="flex items-center justify-between w-full h-12 px-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-primary transition-all group">
-                      <div className="flex items-center gap-3">
-                        <svg
-                          className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 4v16m8-8H4"
-                          />
-                        </svg>
-                        <span className="text-sm text-gray-500 group-hover:text-gray-700 font-medium">
-                          Click to upload or drag and drop
-                        </span>
-                      </div>
-                      <span className="text-xs text-gray-400">PNG, JPG, WEBP</span>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        disabled={authLoading}
-                      />
-                    </label>
-                    <p className="text-xs text-gray-400 mt-1">(Optional)</p>
-                  </div>
+                  <label className="flex items-center justify-between w-full h-12 px-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-primary transition-all group">
+                    <div className="flex items-center gap-3">
+                      <svg
+                        className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      <span className="text-sm text-gray-500 group-hover:text-gray-700 font-medium">
+                        Click to upload or drag and drop
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-400">PNG, JPG, WEBP</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      disabled={authLoading}
+                    />
+                  </label>
                 )}
               </div>
 
@@ -351,7 +433,7 @@ const Registration = () => {
             <p className="text-center text-sm text-gray-600">
               Already have an account?{" "}
               <Link to="/login" className="text-primary hover:text-primary-dark font-semibold">
-                Sign in
+                Login
               </Link>
             </p>
           </div>

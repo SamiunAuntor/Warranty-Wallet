@@ -10,15 +10,50 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   
   const { loginWithEmail, loginWithGoogle, resetPassword, authLoading } = useAuth();
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+
+    // Validate email
+    if (!email.trim()) {
+      newErrors.email = "Email address is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Validate password
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    }
+
+    // If there are errors, set them and return
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Clear errors if validation passes
+    setErrors({});
+
     const result = await loginWithEmail(email, password);
     if (result.success) {
       navigate("/dashboard");
+    } else {
+      // Handle login errors
+      if (result.error) {
+        if (result.error.includes("email") || result.error.includes("user-not-found")) {
+          setErrors({ email: result.error });
+        } else if (result.error.includes("password") || result.error.includes("wrong-password")) {
+          setErrors({ password: result.error });
+        } else {
+          setErrors({ general: result.error });
+        }
+      }
     }
   };
 
@@ -31,10 +66,32 @@ const Login = () => {
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+
+    // Validate email
+    if (!resetEmail.trim()) {
+      newErrors.resetEmail = "Email address is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
+      newErrors.resetEmail = "Please enter a valid email address";
+    }
+
+    // If there are errors, set them and return
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Clear errors if validation passes
+    setErrors({});
+
     const result = await resetPassword(resetEmail);
     if (result.success) {
       setShowForgotPassword(false);
       setResetEmail("");
+    } else {
+      if (result.error) {
+        setErrors({ resetEmail: result.error });
+      }
     }
   };
 
@@ -102,24 +159,36 @@ const Login = () => {
                 </div>
 
                 <form onSubmit={handleEmailLogin} className="space-y-5">
+                  {errors.general && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                      <p className="text-sm text-red-600">{errors.general}</p>
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email Address
+                      Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (errors.email) setErrors({ ...errors, email: null });
+                      }}
                       required
                       disabled={authLoading}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none ${
+                        errors.email ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                      }`}
                       placeholder="you@example.com"
                     />
+                    {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email}</p>}
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="block text-sm font-semibold text-gray-700">
-                        Password
+                        Password <span className="text-red-500">*</span>
                       </label>
                       <button
                         type="button"
@@ -134,10 +203,15 @@ const Login = () => {
                       <input
                         type={showPassword ? "text" : "password"}
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (errors.password) setErrors({ ...errors, password: null });
+                        }}
                         required
                         disabled={authLoading}
-                        className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className={`w-full px-4 py-3 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed outline-none ${
+                          errors.password ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                        }`}
                         placeholder="••••••••"
                       />
                       <button
@@ -158,6 +232,7 @@ const Login = () => {
                         )}
                       </button>
                     </div>
+                    {errors.password && <p className="text-sm text-red-600 mt-1">{errors.password}</p>}
                   </div>
                   <button
                     type="submit"
@@ -220,7 +295,7 @@ const Login = () => {
                 <p className="text-center text-sm text-gray-600">
                   Don't have an account?{" "}
                   <Link to="/registration" className="text-primary hover:text-primary-dark font-semibold">
-                    Sign up
+                    Register
                   </Link>
                 </p>
               </>
@@ -231,19 +306,31 @@ const Login = () => {
                   <p className="text-gray-600">Enter your email to receive reset instructions</p>
                 </div>
                 <form onSubmit={handleForgotPassword} className="space-y-5">
+                  {errors.general && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                      <p className="text-sm text-red-600">{errors.general}</p>
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email Address
+                      Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
                       value={resetEmail}
-                      onChange={(e) => setResetEmail(e.target.value)}
+                      onChange={(e) => {
+                        setResetEmail(e.target.value);
+                        if (errors.resetEmail) setErrors({ ...errors, resetEmail: null });
+                      }}
                       required
                       disabled={authLoading}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all disabled:opacity-50"
+                      className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-primary transition-all disabled:opacity-50 outline-none ${
+                        errors.resetEmail ? "border-red-300 focus:border-red-500" : "border-gray-200 focus:border-primary"
+                      }`}
                       placeholder="you@example.com"
                     />
+                    {errors.resetEmail && <p className="text-sm text-red-600 mt-1">{errors.resetEmail}</p>}
                   </div>
                   <div className="flex gap-3">
                     <button

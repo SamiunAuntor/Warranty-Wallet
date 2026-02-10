@@ -52,20 +52,29 @@ const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
   const isEdit = Boolean(formValues._id);
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm">
-      <div className="w-full max-w-xl bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-0">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal Container: Sharp corners & Mobile responsive width */}
+      <div className="relative w-11/12 sm:w-full max-w-2xl bg-white rounded-sm shadow-2xl border border-slate-300 overflow-hidden">
+
+        {/* Header - Technical Style */}
+        <div className="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-black text-slate-900">
-              {isEdit ? "Edit Product & Warranty" : "Add New Product"}
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+              {isEdit ? "Update Inventory Item" : "New Inventory Entry"}
             </h3>
-            <p className="text-xs text-slate-500">
-              Store your product details along with its warranty information.
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+              Secure documentation for product warranty
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 text-xl font-bold px-2"
+            className="text-slate-400 hover:text-slate-900 transition-colors p-1"
             type="button"
           >
             ×
@@ -74,50 +83,54 @@ const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
 
         <form
           onSubmit={handleSubmit}
-          className="px-6 py-5 space-y-5 max-h-[75vh] overflow-y-auto"
+          className="px-5 py-5 space-y-6 max-h-[80vh] overflow-y-auto bg-white"
         >
-          {/* Product Details */}
-          <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-3 ml-1">
-              Product Details
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Section: Product Information */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+              <span className="text-[10px] font-black bg-slate-900 text-white px-1.5 py-0.5 rounded-sm">01</span>
+              <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                Product Information
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Product Name <span className="text-red-500">*</span>
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-1 ml-0.5">
+                  Product Name <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formValues.productName}
                   onChange={(e) => handleChange("productName", e.target.value)}
-                  placeholder="Samsung 55-inch QLED TV"
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700"
+                  placeholder="e.g. MacBook Pro M3"
+                  className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 focus:ring-0 outline-none text-sm text-slate-700 transition-all placeholder:text-slate-300"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Brand <span className="text-red-500">*</span>
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-1 ml-0.5">
+                  Brand <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={formValues.brand}
                   onChange={(e) => handleChange("brand", e.target.value)}
-                  placeholder="Samsung"
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700"
+                  placeholder="Apple"
+                  className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 focus:ring-0 outline-none text-sm text-slate-700 placeholder:text-slate-300"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Category <span className="text-red-500">*</span>
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-1 ml-0.5">
+                  Category <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formValues.category}
                   onChange={(e) => handleChange("category", e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700 bg-white"
+                  className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700 bg-white"
                   required
                 >
                   <option value="">Select category</option>
@@ -131,141 +144,110 @@ const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
             </div>
           </div>
 
-          {/* Warranty Details */}
-          <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.18em] mb-3 ml-1">
-              Warranty Details
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Section: Warranty & Finance */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+              <span className="text-[10px] font-black bg-slate-900 text-white px-1.5 py-0.5 rounded-sm">02</span>
+              <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                Warranty & Billing
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Purchase Date <span className="text-red-500">*</span>
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-1 ml-0.5">
+                  Purchase Date <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="date"
                   value={formValues.purchaseDate}
                   onChange={(e) => handleChange("purchaseDate", e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700"
+                  className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Warranty Duration (months) <span className="text-red-500">*</span>
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-1 ml-0.5">
+                  Duration (Months) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="number"
                   min={1}
                   value={formValues.warrantyDuration}
                   onChange={(e) => handleChange("warrantyDuration", e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700"
+                  className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700"
                   required
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Warranty Type
-                </label>
-                <select
-                  value={formValues.warrantyType}
-                  onChange={(e) => handleChange("warrantyType", e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700 bg-white"
-                >
-                  <option value="Manufacturer">Manufacturer</option>
-                  <option value="Extended">Extended</option>
-                </select>
-              </div>
-
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Invoice Image
+                <label className="block text-[10px] font-black text-slate-500 uppercase mb-1 ml-0.5">
+                  Invoice Image Attachment
                 </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) setInvoiceFile(file);
-                  }}
-                  className="w-full text-sm text-slate-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
-                />
-                <p className="text-[11px] text-slate-400 mt-1 ml-1">
-                  Upload a clear photo or screenshot of your purchase invoice.
-                </p>
+                <div className="mt-1 flex items-center gap-4 p-3 border border-dashed border-slate-300 bg-slate-50 rounded-sm">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setInvoiceFile(file);
+                    }}
+                    className="text-[11px] text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-sm file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-slate-900 file:text-white hover:file:bg-black transition-all"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Service & Notes */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                Notes
-              </label>
+          {/* Section: Support Details */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+              <span className="text-[10px] font-black bg-slate-900 text-white px-1.5 py-0.5 rounded-sm">03</span>
+              <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                Support & Center Info
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input
+                type="text"
+                value={formValues.serviceCenterName}
+                onChange={(e) => handleChange("serviceCenterName", e.target.value)}
+                placeholder="Service Center Name"
+                className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700"
+              />
+              <input
+                type="text"
+                value={formValues.serviceCenterPhone}
+                onChange={(e) => handleChange("serviceCenterPhone", e.target.value)}
+                placeholder="Support Phone Number"
+                className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700"
+              />
               <textarea
                 value={formValues.notes}
                 onChange={(e) => handleChange("notes", e.target.value)}
-                placeholder="Any important details you want to remember for this product or its warranty."
-                className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700 min-h-[80px]"
+                placeholder="Internal notes regarding this item..."
+                className="md:col-span-2 w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700 min-h-[60px]"
               />
-            </div>
-
-            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Service Center Name
-                </label>
-                <input
-                  type="text"
-                  value={formValues.serviceCenterName}
-                  onChange={(e) => handleChange("serviceCenterName", e.target.value)}
-                  placeholder="Samsung Service Center"
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Service Center Phone
-                </label>
-                <input
-                  type="text"
-                  value={formValues.serviceCenterPhone}
-                  onChange={(e) => handleChange("serviceCenterPhone", e.target.value)}
-                  placeholder="+1 234 567 890"
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5 ml-1">
-                  Service Center Address
-                </label>
-                <input
-                  type="text"
-                  value={formValues.serviceCenterAddress}
-                  onChange={(e) => handleChange("serviceCenterAddress", e.target.value)}
-                  placeholder="123 Service St, City"
-                  className="w-full px-4 py-2.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 outline-none text-sm text-slate-700"
-                />
-              </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
+          {/* Action Buttons */}
+          <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-sm font-bold text-slate-700 transition-all"
+              className="px-4 py-2 rounded-sm bg-white border border-slate-200 text-[11px] font-black uppercase text-slate-500 hover:bg-slate-50 transition-all"
             >
-              Cancel
+              Discard
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-sm font-bold text-white shadow-md active:scale-95 transition-all"
+              className="px-6 py-2 rounded-sm bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-[11px] font-black uppercase text-white shadow-sm active:scale-95 transition-all"
             >
-              {submitting ? "Saving..." : isEdit ? "Save Changes" : "Add Product"}
+              {submitting ? "Processing..." : isEdit ? "Update Entry" : "Finalize Entry"}
             </button>
           </div>
         </form>

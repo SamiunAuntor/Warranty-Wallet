@@ -30,7 +30,7 @@ const formatDateTime = (date) => {
 const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvoice }) => {
   if (loading) {
     return (
-      <p className="text-slate-400 text-sm py-10 text-center">
+      <p className="text-slate-400 text-xs py-10 text-center uppercase tracking-widest font-medium">
         Loading products &amp; warranties...
       </p>
     );
@@ -38,17 +38,15 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
 
   if (!warranties || warranties.length === 0) {
     return (
-      <div className="text-center py-10 text-slate-400 text-sm">
-        <p className="font-semibold mb-2">No products yet</p>
-        <p className="mb-4">
-          Add your first product with warranty to get started.
-        </p>
+      <div className="text-center py-10 text-slate-400 text-xs border border-slate-200 rounded-xl m-4">
+        <p className="font-bold mb-1 text-slate-600 uppercase">No products yet</p>
+        <p className="mb-4">Add your first product with warranty to get started.</p>
         <button
           onClick={onAdd}
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-2xl text-sm font-bold shadow-md active:scale-95 transition-all"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase shadow-md active:scale-95 transition-all"
           type="button"
         >
-          <Plus size={18} />
+          <Plus size={14} />
           Add Product
         </button>
       </div>
@@ -57,25 +55,25 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full text-sm">
+      <table className="min-w-full text-[13px] border-collapse bg-white">
         <thead>
-          <tr className="text-left text-slate-400 text-xs uppercase tracking-[0.16em] border-b-2 border-slate-200">
-            <th className="py-3 px-4 font-bold">Product Name</th>
-            <th className="py-3 px-4 font-bold">Brand</th>
-            <th className="py-3 px-4 font-bold">Category</th>
-            <th className="py-3 px-4 font-bold">Purchase Date</th>
-            <th className="py-3 px-4 font-bold">Warranty Duration</th>
-            <th className="py-3 px-4 font-bold">Warranty Type</th>
-            <th className="py-3 px-4 font-bold">Expiry Date</th>
-            <th className="py-3 px-4 font-bold">Status</th>
-            <th className="py-3 px-4 font-bold">Service Center</th>
-            <th className="py-3 px-4 font-bold">Notes</th>
-            <th className="py-3 px-4 font-bold">Invoice</th>
-            <th className="py-3 px-4 font-bold">Created</th>
-            <th className="py-3 px-4 font-bold">Actions</th>
+          <tr className="text-left text-slate-500 bg-slate-50 uppercase tracking-wider">
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Product Name</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Brand</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Category</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Purchase</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Warranty</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Type</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Expiry</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Status</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Service Center</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Notes</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Invoice</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Created</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] text-center">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="leading-tight">
           {warranties.map((product) => {
             const statusStyle =
               STATUS_COLORS[product.status] ||
@@ -84,91 +82,81 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
             return (
               <tr
                 key={product._id}
-                className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors"
+                className="hover:bg-slate-50/50 transition-colors"
               >
-                <td className="py-3 px-4">
-                  <p className="font-bold text-slate-900">{product.productName || "N/A"}</p>
+                <td className="py-2 px-3 border border-slate-100">
+                  <p className="font-bold text-slate-900 truncate max-w-[140px]">{product.productName || "N/A"}</p>
                 </td>
-                <td className="py-3 px-4 text-slate-700">{product.brand || "N/A"}</td>
-                <td className="py-3 px-4 text-slate-700">{product.category || "N/A"}</td>
-                <td className="py-3 px-4 text-slate-600">
+                <td className="py-2 px-3 border border-slate-100 text-slate-700">{product.brand || "N/A"}</td>
+                <td className="py-2 px-3 border border-slate-100 text-slate-700">{product.category || "N/A"}</td>
+                <td className="py-2 px-3 border border-slate-100 text-slate-600 whitespace-nowrap">
                   {formatDate(product.purchaseDate)}
                 </td>
-                <td className="py-3 px-4 text-slate-600">
-                  {product.warrantyDuration ? `${product.warrantyDuration} months` : "N/A"}
+                <td className="py-2 px-3 border border-slate-100 text-slate-600 whitespace-nowrap">
+                  {product.warrantyDuration ? `${product.warrantyDuration} mo` : "N/A"}
                 </td>
-                <td className="py-3 px-4 text-slate-600">
+                <td className="py-2 px-3 border border-slate-100 text-slate-600 text-[11px] uppercase font-medium">
                   {product.warrantyType || "N/A"}
                 </td>
-                <td className="py-3 px-4 text-slate-600">
+                <td className="py-2 px-3 border border-slate-100 text-slate-600 font-semibold whitespace-nowrap">
                   {formatDate(product.expiryDate)}
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2 px-3 border border-slate-100">
                   <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border ${statusStyle}`}
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-black uppercase border ${statusStyle}`}
                   >
                     {product.status || "Unknown"}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-slate-600 max-w-[200px]">
+                <td className="py-2 px-3 border border-slate-100 text-slate-600 max-w-[150px]">
                   {product.serviceCenterName ? (
-                    <div className="text-xs">
-                      <p className="font-semibold truncate">{product.serviceCenterName}</p>
-                      {product.serviceCenterPhone && (
-                        <p className="text-slate-500 truncate">{product.serviceCenterPhone}</p>
-                      )}
-                      {product.serviceCenterAddress && (
-                        <p className="text-slate-400 truncate">{product.serviceCenterAddress}</p>
-                      )}
+                    <div className="text-[11px]">
+                      <p className="font-bold truncate">{product.serviceCenterName}</p>
+                      <p className="text-slate-400 truncate">{product.serviceCenterPhone}</p>
                     </div>
                   ) : (
-                    "N/A"
+                    <span className="text-slate-300">N/A</span>
                   )}
                 </td>
-                <td className="py-3 px-4 text-slate-600 max-w-[200px]">
-                  {product.notes ? (
-                    <p className="text-xs truncate" title={product.notes}>
-                      {product.notes}
-                    </p>
-                  ) : (
-                    "N/A"
-                  )}
+                <td className="py-2 px-3 border border-slate-100 text-slate-600 max-w-[120px]">
+                  <p className="text-[11px] truncate italic" title={product.notes}>
+                    {product.notes || "---"}
+                  </p>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2 px-3 border border-slate-100 text-center">
                   {product.invoiceId ? (
                     <button
                       onClick={() => onViewInvoice && onViewInvoice(product)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-[11px] font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
-                      title="View invoice"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-colors uppercase"
                       type="button"
                     >
-                      <FileText size={12} />
+                      <FileText size={10} />
                       View
                     </button>
                   ) : (
-                    <span className="text-slate-400 text-xs">No invoice</span>
+                    <span className="text-slate-300 text-[10px]">None</span>
                   )}
                 </td>
-                <td className="py-3 px-4 text-slate-500 text-xs">
+                <td className="py-2 px-3 border border-slate-100 text-slate-400 text-[10px] whitespace-nowrap">
                   {formatDateTime(product.createdAt)}
                 </td>
-                <td className="py-3 px-4">
-                  <div className="flex items-center gap-2">
+                <td className="py-2 px-3 border border-slate-100">
+                  <div className="flex items-center justify-center gap-1.5">
                     <button
                       onClick={() => onEdit && onEdit(product)}
-                      className="p-1.5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-700 transition-colors"
-                      title="Edit product"
+                      className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                      title="Edit"
                       type="button"
                     >
-                      <Edit2 size={16} />
+                      <Edit2 size={14} />
                     </button>
                     <button
                       onClick={() => onDelete && onDelete(product)}
-                      className="p-1.5 rounded-full hover:bg-rose-50 text-rose-500 hover:text-rose-700 transition-colors"
-                      title="Delete product"
+                      className="p-1 rounded hover:bg-rose-50 text-rose-400 hover:text-rose-600 transition-colors"
+                      title="Delete"
                       type="button"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </td>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Plus, PackageSearch } from "lucide-react";
 import useAxios from "../Hooks/useAxios";
 import { uploadImageToImgBB } from "../Utils/UploadImage";
 import { showErrorAlert, showInfoAlert, showConfirmAlert, queueSuccessToast, queueErrorToast } from "../Utils/alerts";
@@ -138,7 +138,6 @@ const Products = () => {
 
     const handleSubmitForm = async (formValues, invoiceFile) => {
         try {
-            // Show confirmation only when editing
             if (editingProduct) {
                 const result = await showConfirmAlert(
                     "Save changes?",
@@ -177,42 +176,52 @@ const Products = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 w-full">
+            {/* Header: Reduced font and padding */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 px-1">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 mb-1">Products</h1>
-                    <p className="text-slate-600">
-                        Register your products with warranty details and invoices.
+                    <h1 className="text-2xl font-black text-slate-900 mb-0.5 uppercase tracking-tight">Products</h1>
+                    <p className="text-xs text-slate-500 font-medium">
+                        Manage your product warranties and digital invoices in one place.
                     </p>
                 </div>
                 <button
                     onClick={handleOpenCreate}
-                    className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-2xl text-sm font-bold shadow-md active:scale-95 transition-all"
+                    className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-tight shadow-sm active:scale-95 transition-all whitespace-nowrap"
                     type="button"
                 >
-                    <Plus size={18} />
+                    <Plus size={16} />
                     Add Product
                 </button>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-black text-slate-900">All Products</h2>
-                    <p className="text-xs font-medium text-slate-400 uppercase tracking-[0.16em]">
-                        {products.length} item{products.length !== 1 ? "s" : ""}
-                    </p>
+            {/* Main Table Container: Strict 4-sided grid */}
+            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
+                {/* Section Header: Compact */}
+                <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/30">
+                    <div className="flex items-center gap-2">
+                        <PackageSearch className="text-emerald-600" size={18} />
+                        <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Active Inventory</h2>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-2 py-1 rounded border border-slate-200 shadow-sm">
+                        {products.length} Items
+                    </span>
                 </div>
 
-                <WarrantyList
-                    warranties={products}
-                    loading={isLoading}
-                    onAdd={handleOpenCreate}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onViewInvoice={handleViewInvoice}
-                />
+                {/* Table Surface: p-0 to allow internal grid lines to touch edges */}
+                <div className="p-0 overflow-x-auto text-[13px]">
+                    <WarrantyList
+                        warranties={products}
+                        loading={isLoading}
+                        onAdd={handleOpenCreate}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        onViewInvoice={handleViewInvoice}
+                    />
+                </div>
             </div>
 
+            {/* Modals */}
             {isFormOpen && (
                 <WarrantyForm
                     initialData={editingProduct}
@@ -234,5 +243,3 @@ const Products = () => {
 };
 
 export default Products;
-
-

@@ -6,6 +6,8 @@ import LoginPage from "./Pages/LoginPage";
 import Registration from "./Pages/Registration";
 import ResetPassword from "./Pages/ResetPassword";
 import Dashboard from "./Pages/Dashboard";
+import Products from "./Pages/Products";
+import Profile from "./Pages/Profile";
 
 const router = createBrowserRouter([
     {
@@ -38,6 +40,14 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <Dashboard></Dashboard>,
+            },
+            {
+                path: "products",
+                element: <Products></Products>
+            },
+            {
+                path: "profile",
+                element: <Profile></Profile>
             }
         ]
     },

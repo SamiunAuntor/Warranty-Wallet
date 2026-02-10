@@ -10,7 +10,7 @@ import {
     updateProfile,
     sendPasswordResetEmail
 } from "firebase/auth";
-import app from "../firebase/firebase.config";
+import app from "./firebase.config";
 
 // Create Auth Context
 export const AuthContext = createContext(null);

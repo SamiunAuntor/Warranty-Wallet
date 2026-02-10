@@ -38,6 +38,20 @@ export const showInfoAlert = (title, text) => {
   });
 };
 
+// Confirmation alert (returns promise with isConfirmed)
+export const showConfirmAlert = (title, text, confirmText = "Yes", cancelText = "Cancel") => {
+  return Swal.fire({
+    ...baseConfig,
+    icon: "question",
+    title,
+    text,
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    reverseButtons: true,
+  });
+};
+
 // Toasts (non-blocking) shown AFTER navigation
 const TOAST_KEY = "ww_pending_toast";
 

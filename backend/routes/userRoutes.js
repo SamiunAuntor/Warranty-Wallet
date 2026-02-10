@@ -1,9 +1,10 @@
 const express = require('express');
 const { getUsersCollection } = require('../db');
+const { authenticate } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Create or update user document based on email
+// Create or update user document based on email (used during auth sync)
 router.post('/', async (req, res) => {
   try {
     const { name, email, photoURL } = req.body;
@@ -61,5 +62,14 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+// Get current authenticated user profile
+router.get('/me', authenticate, async (req, res) => {
+  try {
+    return res.json(req.user);
+  } catch (err) {
+    console.error('Error fetching current user profile:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
+module.exports = router;

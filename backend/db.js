@@ -53,9 +53,41 @@ async function getUsersCollection() {
   return collection;
 }
 
+async function getProductsCollection() {
+  const database = await connectDB();
+  const collection = database.collection('products');
+  console.log('📂 Accessing products collection (will be created if it doesn\'t exist)');
+  return collection;
+}
+
+async function getInvoicesCollection() {
+  const database = await connectDB();
+  const collection = database.collection('invoices');
+  console.log('📂 Accessing invoices collection (will be created if it doesn\'t exist)');
+  return collection;
+}
+
+async function getRemindersCollection() {
+  const database = await connectDB();
+  const collection = database.collection('reminders');
+  console.log('📂 Accessing reminders collection (will be created if it doesn\'t exist)');
+  return collection;
+}
+
+async function getReminderLogsCollection() {
+  const database = await connectDB();
+  const collection = database.collection('reminder_logs');
+  console.log('📂 Accessing reminder_logs collection (will be created if it doesn\'t exist)');
+  return collection;
+}
+
 module.exports = {
   connectDB,
   getUsersCollection,
+  getProductsCollection,
+  getInvoicesCollection,
+  getRemindersCollection,
+  getReminderLogsCollection,
 };
 
 

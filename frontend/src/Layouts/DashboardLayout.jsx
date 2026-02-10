@@ -3,8 +3,7 @@ import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { 
     LayoutDashboard, 
     Package, 
-    FileText, 
-    Settings, 
+    User,
     LogOut,
     Menu,
     X
@@ -34,8 +33,7 @@ const DashboardLayout = () => {
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Package, label: 'Products', path: '/dashboard/products' },
-        { icon: FileText, label: 'Warranties', path: '/dashboard/warranties' },
-        { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
+        { icon: User, label: 'Profile', path: '/dashboard/profile' },
     ];
 
     return (

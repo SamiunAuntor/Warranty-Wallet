@@ -5,7 +5,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
+const invoiceRoutes = require('./routes/invoiceRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 const { connectDB } = require('./db');
+const { startDailyReminderJob } = require('./jobs/dailyReminderCheck');
 
 const app = express();
 
@@ -21,31 +25,35 @@ app.get('/api/test-db', async (req, res) => {
   try {
     const { getUsersCollection } = require('./db');
     const users = await getUsersCollection();
-    
-    // Try to count documents (this will create collection if it doesn't exist)
+
     const count = await users.countDocuments();
-    
-    res.json({ 
-      status: 'ok', 
+
+    res.json({
+      status: 'ok',
       message: 'Database connection successful',
       collection: 'users',
-      documentCount: count
+      documentCount: count,
     });
   } catch (error) {
-    res.status(500).json({ 
-      status: 'error', 
+    res.status(500).json({
+      status: 'error',
       message: 'Database connection failed',
-      error: error.message 
+      error: error.message,
     });
   }
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(() => {
+    startDailyReminderJob();
+
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });

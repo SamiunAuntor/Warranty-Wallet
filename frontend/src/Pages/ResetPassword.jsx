@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Mail, ArrowRight, ArrowLeft } from 'lucide-react';
 import useAuth from '../Hooks/useAuth';
-import { showErrorAlert, queueSuccessToast } from '../Utils/alerts';
+import { queueSuccessToast } from '../Utils/alerts';
 import { getAuthErrorMessage } from '../Utils/authErrorMessages';
 
 const ResetPassword = () => {
@@ -22,7 +22,6 @@ const ResetPassword = () => {
         if (!email) {
             const message = 'Please enter your email address.';
             setError(message);
-            await showErrorAlert('Missing information', message);
             return;
         }
 
@@ -40,7 +39,6 @@ const ResetPassword = () => {
             console.error(err);
             const message = getAuthErrorMessage(err, 'sending the reset email');
             setError(message);
-            await showErrorAlert('Reset failed', message);
         } finally {
             setLoading(false);
         }

@@ -4,7 +4,7 @@ import { ShieldCheck, Eye, EyeOff, User, Mail, Camera, ArrowRight } from 'lucide
 import useAuth from '../Hooks/useAuth';
 import useAxios from '../Hooks/useAxios';
 import { uploadImageToImgBB } from '../Utils/UploadImage';
-import { showErrorAlert, queueSuccessToast } from '../Utils/alerts';
+import { queueSuccessToast } from '../Utils/alerts';
 import { getAuthErrorMessage } from '../Utils/authErrorMessages';
 
 const Registration = () => {
@@ -46,14 +46,12 @@ const Registration = () => {
         if (!fullName || !email || !password) {
             const message = 'Please fill in all required fields.';
             setError(message);
-            await showErrorAlert('Missing information', message);
             return;
         }
 
         if (!photoFile) {
             const message = 'Please upload a profile photo.';
             setError(message);
-            await showErrorAlert('Profile photo required', message);
             return;
         }
 
@@ -91,7 +89,6 @@ const Registration = () => {
             console.error(err);
             const message = getAuthErrorMessage(err, 'creating your account');
             setError(message);
-            await showErrorAlert('Registration failed', message);
         } finally {
             setLoading(false);
         }
@@ -121,7 +118,6 @@ const Registration = () => {
             console.error(err);
             const message = getAuthErrorMessage(err, 'signing up with Google');
             setError(message);
-            await showErrorAlert('Google sign-up failed', message);
         } finally {
             setLoading(false);
         }

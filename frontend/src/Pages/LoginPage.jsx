@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import useAuth from '../Hooks/useAuth';
 import useAxios from '../Hooks/useAxios';
-import { showErrorAlert, queueSuccessToast } from '../Utils/alerts';
+import { queueSuccessToast } from '../Utils/alerts';
 import { getAuthErrorMessage } from '../Utils/authErrorMessages';
 
 const LoginPage = () => {
@@ -42,7 +42,6 @@ const LoginPage = () => {
         if (!email || !password) {
             const message = "Please provide both email and password.";
             setError(message);
-            await showErrorAlert('Missing information', message);
             return;
         }
 
@@ -68,7 +67,6 @@ const LoginPage = () => {
             console.error(err);
             const message = getAuthErrorMessage(err, 'signing you in');
             setError(message);
-            await showErrorAlert('Login failed', message);
         } finally {
             setLoading(false);
         }
@@ -99,7 +97,6 @@ const LoginPage = () => {
             console.error(err);
             const message = getAuthErrorMessage(err, 'signing you in with Google');
             setError(message);
-            await showErrorAlert('Google login failed', message);
         } finally {
             setLoading(false);
         }

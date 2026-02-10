@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import useAuth from '../Hooks/useAuth';
+import useAxios from '../Hooks/useAxios';
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -8,18 +10,86 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
     const [resetEmail, setResetEmail] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    // Static Submit Handlers
-    const handleEmailLogin = (e) => {
+    const { loginUserWithEmailPassword, loginWithGoogle } = useAuth();
+    const axiosSecure = useAxios();
+    const navigate = useNavigate();
+
+    const syncUserToBackend = async ({ name, email, photoURL }) => {
+        try {
+            console.log('🔄 Syncing user to backend...', { name, email });
+            const response = await axiosSecure.post('/api/users', {
+                name,
+                email,
+                photoURL: photoURL || '',
+            });
+            console.log('✅ User synced to backend successfully:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Failed to sync user to backend:', error);
+            console.error('Error details:', error.response?.data || error.message);
+            // Don't throw - allow login to complete even if backend sync fails
+            // But log it so we can debug
+        }
+    };
+
+    const handleEmailLogin = async (e) => {
         e.preventDefault();
-        // Do nothing for now
-        console.log("Login submitted statically");
+        setError("");
+
+        if (!email || !password) {
+            setError("Please provide email and password.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const result = await loginUserWithEmailPassword(email, password);
+            const fbUser = result.user;
+
+            await syncUserToBackend({
+                name: fbUser.displayName || "User",
+                email: fbUser.email,
+                photoURL: fbUser.photoURL || "",
+            });
+
+            navigate("/dashboard");
+        } catch (err) {
+            console.error(err);
+            setError(err?.message || "Login failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleForgotPassword = (e) => {
         e.preventDefault();
         // Do nothing for now
         console.log("Password reset submitted statically");
+    };
+
+    const handleGoogleLogin = async () => {
+        setError("");
+        try {
+            setLoading(true);
+            const result = await loginWithGoogle();
+            const fbUser = result.user;
+
+            await syncUserToBackend({
+                name: fbUser.displayName || "Google User",
+                email: fbUser.email,
+                photoURL: fbUser.photoURL || "",
+            });
+
+            navigate("/dashboard");
+        } catch (err) {
+            console.error(err);
+            setError(err?.message || "Google login failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -42,10 +112,12 @@ const LoginPage = () => {
 
                     {!showForgotPassword ? (
                         <>
-                            {/* Static Google Login Button */}
+                            {/* Google Login Button */}
                             <button
                                 type="button"
-                                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 transition-all mb-8"
+                                onClick={handleGoogleLogin}
+                                disabled={loading}
+                                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-70 transition-all mb-8"
                             >
                                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="google" />
                                 Continue with Google
@@ -98,9 +170,16 @@ const LoginPage = () => {
                                     </div>
                                 </div>
 
+                                {error && (
+                                    <p className="text-sm text-red-500 font-medium text-center">
+                                        {error}
+                                    </p>
+                                )}
+
                                 <button
                                     type="submit"
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-emerald-100 active:scale-95 flex items-center justify-center gap-2 mt-4"
+                                    disabled={loading}
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-emerald-100 active:scale-95 flex items-center justify-center gap-2 mt-4"
                                 >
                                     Sign In <ArrowRight size={18} />
                                 </button>
@@ -141,7 +220,7 @@ const LoginPage = () => {
                     <div className="mt-10 text-center">
                         <p className="text-sm font-medium text-slate-500">
                             Don't have an account?{" "}
-                            <Link to="/registration" className="text-emerald-600 font-bold hover:underline">
+                            <Link to="/register" className="text-emerald-600 font-bold hover:underline">
                                 Register
                             </Link>
                         </p>

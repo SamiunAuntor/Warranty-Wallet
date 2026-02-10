@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { 
     LayoutDashboard, 
@@ -10,6 +10,7 @@ import {
     X
 } from 'lucide-react';
 import useAuth from '../Hooks/useAuth';
+import { showQueuedToastIfAny, queueSuccessToast } from '../Utils/alerts';
 
 const DashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -19,11 +20,16 @@ const DashboardLayout = () => {
     const handleLogout = async () => {
         try {
             await logoutUser();
+            queueSuccessToast('Logged out', 'You have been signed out successfully.');
             navigate('/');
         } catch (error) {
             console.error('Logout failed:', error);
         }
     };
+
+    useEffect(() => {
+        showQueuedToastIfAny();
+    }, []);
 
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },

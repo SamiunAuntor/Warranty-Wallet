@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, LogIn, Menu, X, LogOut, User } from 'lucide-react';
 import useAuth from '../Hooks/useAuth';
+import { queueSuccessToast, showErrorAlert } from '../Utils/alerts';
+import { getAuthErrorMessage } from '../Utils/authErrorMessages';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -16,9 +18,12 @@ const Navbar = () => {
     const handleLogout = async () => {
         try {
             await logoutUser();
+            queueSuccessToast('Logged out', 'You have been signed out successfully.');
             navigate('/');
         } catch (error) {
             console.error('Logout failed:', error);
+            const message = getAuthErrorMessage(error, 'logging you out');
+            await showErrorAlert('Logout failed', message);
         }
     };
 

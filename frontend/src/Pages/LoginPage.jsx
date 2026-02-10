@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import useAuth from '../Hooks/useAuth';
 import useAxios from '../Hooks/useAxios';
+import { showErrorAlert, queueSuccessToast } from '../Utils/alerts';
+import { getAuthErrorMessage } from '../Utils/authErrorMessages';
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [showForgotPassword, setShowForgotPassword] = useState(false);
-    const [resetEmail, setResetEmail] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -40,7 +40,9 @@ const LoginPage = () => {
         setError("");
 
         if (!email || !password) {
-            setError("Please provide email and password.");
+            const message = "Please provide both email and password.";
+            setError(message);
+            await showErrorAlert('Missing information', message);
             return;
         }
 
@@ -55,20 +57,23 @@ const LoginPage = () => {
                 photoURL: fbUser.photoURL || "",
             });
 
+            // Queue toast to show after redirect on dashboard
+            queueSuccessToast(
+                'Welcome back',
+                'You have successfully signed in.'
+            );
+
             navigate("/dashboard");
         } catch (err) {
             console.error(err);
-            setError(err?.message || "Login failed. Please try again.");
+            const message = getAuthErrorMessage(err, 'signing you in');
+            setError(message);
+            await showErrorAlert('Login failed', message);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleForgotPassword = (e) => {
-        e.preventDefault();
-        // Do nothing for now
-        console.log("Password reset submitted statically");
-    };
 
     const handleGoogleLogin = async () => {
         setError("");
@@ -83,10 +88,18 @@ const LoginPage = () => {
                 photoURL: fbUser.photoURL || "",
             });
 
+            // Queue toast to show after redirect on dashboard
+            queueSuccessToast(
+                'Signed in with Google',
+                'You have successfully signed in.'
+            );
+
             navigate("/dashboard");
         } catch (err) {
             console.error(err);
-            setError(err?.message || "Google login failed. Please try again.");
+            const message = getAuthErrorMessage(err, 'signing you in with Google');
+            setError(message);
+            await showErrorAlert('Google login failed', message);
         } finally {
             setLoading(false);
         }
@@ -99,122 +112,83 @@ const LoginPage = () => {
 
                     {/* Header */}
                     <div className="text-center mb-10">
-                        <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                            
-                        </Link>
-                        <h2 className="text-3xl font-black text-slate-900 mb-2">
-                            {showForgotPassword ? "Reset Password" : "Welcome Back"}
-                        </h2>
+                        <h2 className="text-3xl font-black text-slate-900 mb-2">Welcome Back</h2>
                         <p className="text-slate-500 font-medium">
-                            {showForgotPassword ? "Enter your email to receive instructions" : "Securely manage your product protection"}
+                            Securely manage your product protection
                         </p>
                     </div>
 
-                    {!showForgotPassword ? (
-                        <>
-                            {/* Google Login Button */}
-                            <button
-                                type="button"
-                                onClick={handleGoogleLogin}
-                                disabled={loading}
-                                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-70 transition-all mb-8"
-                            >
-                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="google" />
-                                Continue with Google
-                            </button>
+                    {/* Google Login Button */}
+                    <button
+                        type="button"
+                        onClick={handleGoogleLogin}
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-slate-100 rounded-2xl font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-70 transition-all mb-8"
+                    >
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="google" />
+                        Continue with Google
+                    </button>
 
-                            <div className="relative mb-8 text-center">
-                                <hr className="border-slate-100" />
-                                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Or with email</span>
-                            </div>
+                    <div className="relative mb-8 text-center">
+                        <hr className="border-slate-100" />
+                        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Or with email</span>
+                    </div>
 
-                            {/* Login Form */}
-                            <form onSubmit={handleEmailLogin} className="space-y-5">
-                                <div>
-                                    <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Email Address <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="you@example.com"
-                                        className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 transition-all outline-none font-medium text-slate-600"
-                                    />
-                                </div>
+                    {/* Login Form */}
+                    <form onSubmit={handleEmailLogin} className="space-y-5">
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Email Address <span className="text-red-500">*</span></label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="you@example.com"
+                                className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 transition-all outline-none font-medium text-slate-600"
+                            />
+                        </div>
 
-                                <div>
-                                    <div className="flex justify-between items-center mb-2 ml-1">
-                                        <label className="text-sm font-bold text-slate-700">Password <span className="text-red-500">*</span></label>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowForgotPassword(true)}
-                                            className="text-xs font-bold text-emerald-600 hover:text-emerald-700"
-                                        >
-                                            Forgot Password?
-                                        </button>
-                                    </div>
-                                    <div className="relative">
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            placeholder="••••••••"
-                                            className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 transition-all outline-none font-medium text-slate-600"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                        >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {error && (
-                                    <p className="text-sm text-red-500 font-medium text-center">
-                                        {error}
-                                    </p>
-                                )}
-
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-emerald-100 active:scale-95 flex items-center justify-center gap-2 mt-4"
+                        <div>
+                            <div className="flex justify-between items-center mb-2 ml-1">
+                                <label className="text-sm font-bold text-slate-700">Password <span className="text-red-500">*</span></label>
+                                <Link
+                                    to="/reset-password"
+                                    className="text-xs font-bold text-emerald-600 hover:text-emerald-700"
                                 >
-                                    Sign In <ArrowRight size={18} />
-                                </button>
-                            </form>
-                        </>
-                    ) : (
-                        /* Forgot Password View */
-                        <form onSubmit={handleForgotPassword} className="space-y-6">
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Email Address <span className="text-red-500">*</span></label>
+                                    Forgot Password?
+                                </Link>
+                            </div>
+                            <div className="relative">
                                 <input
-                                    type="email"
-                                    value={resetEmail}
-                                    onChange={(e) => setResetEmail(e.target.value)}
-                                    placeholder="you@example.com"
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
                                     className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-100 focus:border-emerald-600 transition-all outline-none font-medium text-slate-600"
                                 />
-                            </div>
-                            <div className="flex gap-3">
                                 <button
                                     type="button"
-                                    onClick={() => setShowForgotPassword(false)}
-                                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-4 rounded-2xl transition-all"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                                 >
-                                    Back
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-100 transition-all"
-                                >
-                                    Send Reset Link
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
-                        </form>
-                    )}
+                        </div>
+
+                        {error && (
+                            <p className="text-sm text-red-500 font-medium text-center">
+                                {error}
+                            </p>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-emerald-100 active:scale-95 flex items-center justify-center gap-2 mt-4"
+                        >
+                            Sign In <ArrowRight size={18} />
+                        </button>
+                    </form>
 
                     {/* Bottom Link */}
                     <div className="mt-10 text-center">

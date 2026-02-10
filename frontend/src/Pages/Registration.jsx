@@ -4,6 +4,8 @@ import { ShieldCheck, Eye, EyeOff, User, Mail, Camera, ArrowRight } from 'lucide
 import useAuth from '../Hooks/useAuth';
 import useAxios from '../Hooks/useAxios';
 import { uploadImageToImgBB } from '../Utils/UploadImage';
+import { showErrorAlert, queueSuccessToast } from '../Utils/alerts';
+import { getAuthErrorMessage } from '../Utils/authErrorMessages';
 
 const Registration = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -11,6 +13,7 @@ const Registration = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [photoFile, setPhotoFile] = useState(null);
+    const [photoPreview, setPhotoPreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -41,12 +44,16 @@ const Registration = () => {
         setError('');
 
         if (!fullName || !email || !password) {
-            setError('Please fill in all required fields.');
+            const message = 'Please fill in all required fields.';
+            setError(message);
+            await showErrorAlert('Missing information', message);
             return;
         }
 
         if (!photoFile) {
-            setError('Please upload a profile photo.');
+            const message = 'Please upload a profile photo.';
+            setError(message);
+            await showErrorAlert('Profile photo required', message);
             return;
         }
 
@@ -73,10 +80,18 @@ const Registration = () => {
                 photoURL,
             });
 
+            // Queue toast to show after redirect on dashboard
+            queueSuccessToast(
+                'Account created',
+                'Welcome to WarrantyWallet! Your account is ready.'
+            );
+
             navigate('/dashboard');
         } catch (err) {
             console.error(err);
-            setError(err?.message || 'Registration failed. Please try again.');
+            const message = getAuthErrorMessage(err, 'creating your account');
+            setError(message);
+            await showErrorAlert('Registration failed', message);
         } finally {
             setLoading(false);
         }
@@ -95,10 +110,18 @@ const Registration = () => {
                 photoURL: fbUser.photoURL || '',
             });
 
+            // Queue toast to show after redirect on dashboard
+            queueSuccessToast(
+                'Signed up with Google',
+                'Your account is ready. Welcome to WarrantyWallet!'
+            );
+
             navigate('/dashboard');
         } catch (err) {
             console.error(err);
-            setError(err?.message || 'Google sign up failed. Please try again.');
+            const message = getAuthErrorMessage(err, 'signing up with Google');
+            setError(message);
+            await showErrorAlert('Google sign-up failed', message);
         } finally {
             setLoading(false);
         }
@@ -111,12 +134,7 @@ const Registration = () => {
 
                     {/* Header */}
                     <div className="text-center mb-10">
-                        <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                            <div className="bg-emerald-600 p-2 rounded-xl shadow-lg shadow-emerald-200">
-                                <ShieldCheck className="w-6 h-6 text-white" />
-                            </div>
-                            <span className="text-2xl font-black text-slate-800 tracking-tight">WarrantyWise</span>
-                        </Link>
+                        
                         <h2 className="text-3xl font-black text-slate-900 mb-2">Create Account</h2>
                         <p className="text-slate-500 font-medium">Join thousands managing warranties smarter</p>
                     </div>
@@ -124,18 +142,30 @@ const Registration = () => {
                     {/* Registration Form */}
                     <form onSubmit={handleRegister} className="space-y-5">
 
-                        {/* Profile Image Upload */}
+                        {/* Profile Image Upload with Preview */}
                         <div className="flex flex-col items-center justify-center mb-8">
                             <div className="relative group">
                                 <div className="w-24 h-24 bg-slate-100 rounded-3xl border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden transition-all group-hover:border-emerald-500 group-hover:bg-emerald-50">
-                                    <Camera className="w-8 h-8 text-slate-400 group-hover:text-emerald-500" />
+                                    {photoPreview ? (
+                                        <img
+                                            src={photoPreview}
+                                            alt="Profile preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <Camera className="w-8 h-8 text-slate-400 group-hover:text-emerald-500" />
+                                    )}
                                     <input
                                         type="file"
                                         accept="image/*"
                                         className="absolute inset-0 opacity-0 cursor-pointer"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0];
-                                            if (file) setPhotoFile(file);
+                                            if (file) {
+                                                setPhotoFile(file);
+                                                const previewUrl = URL.createObjectURL(file);
+                                                setPhotoPreview(previewUrl);
+                                            }
                                         }}
                                     />
                                 </div>
@@ -144,7 +174,7 @@ const Registration = () => {
                                 </div>
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-3">
-                                {photoFile ? 'Photo selected' : 'Upload Profile Photo'}
+                                {photoFile ? 'Preview loaded' : 'Upload Profile Photo'}
                             </span>
                         </div>
 

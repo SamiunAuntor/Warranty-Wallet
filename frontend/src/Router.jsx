@@ -4,6 +4,7 @@ import DashboardLayout from "./Layouts/DashboardLayout";
 import HomePage from "./Pages/HomePage";
 import LoginPage from "./Pages/LoginPage";
 import Registration from "./Pages/Registration";
+import ResetPassword from "./Pages/ResetPassword";
 import Dashboard from "./Pages/Dashboard";
 
 const router = createBrowserRouter([
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
             {
                 path: "/register",
                 element: <Registration></Registration>
+            },
+            {
+                path: "/reset-password",
+                element: <ResetPassword></ResetPassword>
             }
         ]
 

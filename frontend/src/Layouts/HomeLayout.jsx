@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+import { showQueuedToastIfAny } from '../Utils/alerts';
 
 const HomeLayout = () => {
+    useEffect(() => {
+        showQueuedToastIfAny();
+    }, []);
+
     return (
         <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
             {/* Soft background glow for a professional touch */}

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { showInfoAlert } from "../../Utils/alerts";
 
 const defaultFormState = {
   _id: null,
@@ -35,7 +36,12 @@ const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
     };
   });
 
-  const [invoiceFile, setInvoiceFile] = useState(null);
+  const [invoiceFiles, setInvoiceFiles] = useState([]);
+
+  // Reset invoice files when form mode changes (create vs edit)
+  useEffect(() => {
+    setInvoiceFiles([]);
+  }, [initialData?._id]);
 
   const handleChange = (field, value) => {
     setFormValues((prev) => ({
@@ -44,9 +50,19 @@ const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formValues, invoiceFile);
+    
+    // Validate invoice files for new products
+    if (!isEdit && (!invoiceFiles || invoiceFiles.length === 0)) {
+      await showInfoAlert(
+        "Invoice required",
+        "Please attach at least one invoice image when adding a new product."
+      );
+      return;
+    }
+    
+    onSubmit(formValues, invoiceFiles);
   };
 
   const isEdit = Boolean(formValues._id);
@@ -183,18 +199,72 @@ const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
 
               <div className="md:col-span-2">
                 <label className="block text-[10px] font-black text-slate-500 uppercase mb-1 ml-0.5">
-                  Invoice Image Attachment
+                  Invoice Images <span className="text-rose-500">*</span> <span className="text-slate-400 font-normal">(Max 4 images)</span>
                 </label>
-                <div className="mt-1 flex items-center gap-4 p-3 border border-dashed border-slate-300 bg-slate-50 rounded-sm">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setInvoiceFile(file);
-                    }}
-                    className="text-[11px] text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-sm file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-slate-900 file:text-white hover:file:bg-black transition-all"
-                  />
+                <div className="mt-1 space-y-2">
+                  <div className="flex items-center gap-4 p-3 border border-dashed border-slate-300 bg-slate-50 rounded-sm">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      id="invoice-file-input"
+                      onChange={async (e) => {
+                        const newFiles = Array.from(e.target.files || []);
+                        if (newFiles.length === 0) return;
+                        
+                        // Calculate how many more files we can add
+                        const currentCount = invoiceFiles.length;
+                        const remainingSlots = 4 - currentCount;
+                        
+                        if (remainingSlots <= 0) {
+                          await showInfoAlert(
+                            "Maximum images reached",
+                            "Maximum 4 images allowed. Please remove some images first."
+                          );
+                          e.target.value = ''; // Reset input
+                          return;
+                        }
+                        
+                        // Take only as many files as we have slots for
+                        const filesToAdd = newFiles.slice(0, remainingSlots);
+                        
+                        // Append new files to existing array
+                        const updatedFiles = [...invoiceFiles, ...filesToAdd];
+                        setInvoiceFiles(updatedFiles);
+                        
+                        // Reset input so user can select more files
+                        e.target.value = '';
+                      }}
+                      className="text-[11px] text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-sm file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-slate-900 file:text-white hover:file:bg-black transition-all"
+                    />
+                  </div>
+                  {invoiceFiles.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        {invoiceFiles.map((file, index) => (
+                          <div
+                            key={`${file.name}-${index}`}
+                            className="flex items-center gap-2 px-2 py-1 bg-white border border-slate-200 rounded-sm text-[10px]"
+                          >
+                            <span className="text-slate-700 truncate max-w-[150px]">{file.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newFiles = invoiceFiles.filter((_, i) => i !== index);
+                                setInvoiceFiles(newFiles);
+                              }}
+                              className="text-rose-500 hover:text-rose-700 font-bold"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-[9px] text-slate-500 font-medium">
+                        {invoiceFiles.length} / 4 images selected
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

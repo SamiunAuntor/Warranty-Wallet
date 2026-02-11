@@ -80,27 +80,33 @@
 
 ## 3. invoices Collection
 
-**Purpose**: Store invoice/document metadata and storage references
+**Purpose**: Store invoice/document metadata and storage references (supports multiple images per product)
 
 ```javascript
 {
   "_id": ObjectId,                    // MongoDB auto-generated
   "userId": ObjectId,                // Reference to users._id (required, indexed)
-  "warrantyId": ObjectId,             // Reference to warranties._id (optional, for linking)
-  "fileName": String,                 // Original file name (required)
-  "fileType": String,                 // "image" | "pdf" (required)
-  "mimeType": String,                 // e.g., "image/jpeg", "application/pdf" (required)
-  "fileSize": Number,                 // File size in bytes (required)
-  "storageUrl": String,               // ImgBB or cloud storage URL (required)
-  "storageProvider": String,          // "imgbb" | "firebase-storage" | "aws-s3" (required)
-  "uploadedAt": Date,                 // Upload timestamp
+  "productId": ObjectId,              // Reference to products._id (required, indexed)
+  "images": [                         // Array of invoice images (required, max 4)
+    {
+      "fileName": String,              // Original file name (required)
+      "fileType": String,              // "image" | "pdf" (required)
+      "mimeType": String,             // e.g., "image/jpeg", "application/pdf" (required)
+      "fileSize": Number,             // File size in bytes (required)
+      "storageUrl": String,           // ImgBB or cloud storage URL (required)
+      "storageProvider": String,       // "imgbb" | "firebase-storage" | "aws-s3" (required)
+      "uploadedAt": Date               // Upload timestamp (required)
+    }
+  ],
+  "createdAt": Date,                  // First invoice creation timestamp
+  "updatedAt": Date,                   // Last update timestamp
   "isDeleted": Boolean                // Soft delete flag (default: false)
 }
 ```
 
 **Indexes**:
 - `userId` (for user queries)
-- `warrantyId` (for warranty linking)
+- `productId` (for product linking)
 - `userId + isDeleted` (compound, for active documents)
 
 ---

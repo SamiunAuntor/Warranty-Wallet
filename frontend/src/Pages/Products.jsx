@@ -29,7 +29,7 @@ const Products = () => {
     });
 
     const upsertProductMutation = useMutation({
-        mutationFn: async ({ formData, invoiceFile }) => {
+        mutationFn: async ({ formData, invoiceFiles }) => {
             const {
                 _id,
                 productName,
@@ -44,10 +44,10 @@ const Products = () => {
                 shopAddress,
             } = formData;
 
-            if (!_id && !invoiceFile) {
+            if (!_id && (!invoiceFiles || invoiceFiles.length === 0)) {
                 await showInfoAlert(
                     "Invoice required",
-                    "Please attach an invoice image when adding a new product."
+                    "Please attach at least one invoice image when adding a new product."
                 );
                 throw new Error("Invoice is required for new products");
             }
@@ -75,16 +75,24 @@ const Products = () => {
                 product = res.data;
             }
 
-            if (invoiceFile) {
-                const storageUrl = await uploadImageToImgBB(invoiceFile);
+            if (invoiceFiles && invoiceFiles.length > 0) {
+                // Upload all images to ImageBB
+                const uploadPromises = invoiceFiles.map(file => uploadImageToImgBB(file));
+                const storageUrls = await Promise.all(uploadPromises);
+
+                // Prepare images array
+                const images = invoiceFiles.map((file, index) => ({
+                    fileName: file.name,
+                    fileType: "image",
+                    mimeType: file.type,
+                    fileSize: file.size,
+                    storageUrl: storageUrls[index],
+                    storageProvider: "imgbb",
+                }));
+
                 await axiosSecure.post("/api/invoices", {
                     productId: product._id,
-                    fileName: invoiceFile.name,
-                    fileType: "image",
-                    mimeType: invoiceFile.type,
-                    fileSize: invoiceFile.size,
-                    storageUrl,
-                    storageProvider: "imgbb",
+                    images,
                 });
             }
 
@@ -139,7 +147,7 @@ const Products = () => {
         }
     };
 
-    const handleSubmitForm = async (formValues, invoiceFile) => {
+    const handleSubmitForm = async (formValues, invoiceFiles) => {
         try {
             if (editingProduct) {
                 const result = await showConfirmAlert(
@@ -156,7 +164,7 @@ const Products = () => {
 
             await upsertProductMutation.mutateAsync({
                 formData: formValues,
-                invoiceFile,
+                invoiceFiles,
             });
             setIsFormOpen(false);
             await showTimedSuccessAlert(

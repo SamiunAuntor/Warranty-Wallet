@@ -45,8 +45,12 @@ const AuthProvider = ({ children }) => {
     };
 
     // Send password reset email
+    // Note: we intentionally do NOT toggle the global `loading` flag here,
+    // because this action does not change auth state and is handled with
+    // local loading state inside the ResetPassword page. Toggling the
+    // global loading would cause route guards (PublicRoute) to show an
+    // infinite loading screen.
     const resetPassword = (email) => {
-        setLoading(true);
         return sendPasswordResetEmail(auth, email);
     };
 

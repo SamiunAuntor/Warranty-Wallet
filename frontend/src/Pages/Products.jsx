@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, PackageSearch } from "lucide-react";
+import { Plus, PackageSearch, Search, Filter, X } from "lucide-react";
 import useAxios from "../Hooks/useAxios";
 import { uploadImageToImgBB } from "../Utils/UploadImage";
 import { showErrorAlert, showInfoAlert, showConfirmAlert, showTimedSuccessAlert } from "../Utils/alerts";
@@ -18,6 +18,9 @@ const Products = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [viewingInvoice, setViewingInvoice] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [emailSentFilter, setEmailSentFilter] = useState("all");
 
     const { data: products = [], isLoading } = useQuery({
         queryKey: ["products"],
@@ -186,6 +189,55 @@ const Products = () => {
         setViewingInvoice(product);
     };
 
+    // Filter and search products
+    const filteredProducts = useMemo(() => {
+        let filtered = [...products];
+
+        // Search filter
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase().trim();
+            filtered = filtered.filter((product) => {
+                const productName = (product.productName || "").toLowerCase();
+                const brand = (product.brand || "").toLowerCase();
+                const category = (product.category || "").toLowerCase();
+                const status = (product.status || "").toLowerCase();
+                const emailSent = product.expiringSoonEmailSentAt ? "sent" : "not sent";
+                
+                return (
+                    productName.includes(query) ||
+                    brand.includes(query) ||
+                    category.includes(query) ||
+                    status.includes(query) ||
+                    emailSent.includes(query)
+                );
+            });
+        }
+
+        // Status filter
+        if (statusFilter !== "all") {
+            filtered = filtered.filter((product) => product.status === statusFilter);
+        }
+
+        // Email sent filter
+        if (emailSentFilter !== "all") {
+            if (emailSentFilter === "sent") {
+                filtered = filtered.filter((product) => Boolean(product.expiringSoonEmailSentAt));
+            } else if (emailSentFilter === "not-sent") {
+                filtered = filtered.filter((product) => !Boolean(product.expiringSoonEmailSentAt));
+            }
+        }
+
+        return filtered;
+    }, [products, searchQuery, statusFilter, emailSentFilter]);
+
+    const hasActiveFilters = searchQuery.trim() || statusFilter !== "all" || emailSentFilter !== "all";
+
+    const clearFilters = () => {
+        setSearchQuery("");
+        setStatusFilter("all");
+        setEmailSentFilter("all");
+    };
+
     return (
         <div className="space-y-6 w-full">
             {/* Header: Reduced font and padding */}
@@ -206,6 +258,73 @@ const Products = () => {
                 </button>
             </div>
 
+            {/* Search and Filter Bar */}
+            <div className="bg-white border border-slate-200 rounded-sm p-4">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+                    {/* Search Bar - Left */}
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Search by product name, brand, category, status, or email sent status..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 rounded-sm border border-slate-200 focus:border-slate-900 focus:ring-0 outline-none text-sm text-slate-700 placeholder:text-slate-400"
+                        />
+                    </div>
+
+                    {/* Filters - Right */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex items-center gap-2">
+                            <Filter className="text-slate-500" size={16} />
+                            <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">Filters:</span>
+                        </div>
+
+                        {/* Status Filter */}
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="px-3 py-1.5 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-xs text-slate-700 bg-white font-medium"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Expiring Soon">Expiring Soon</option>
+                            <option value="Expired">Expired</option>
+                        </select>
+
+                        {/* Email Sent Filter */}
+                        <select
+                            value={emailSentFilter}
+                            onChange={(e) => setEmailSentFilter(e.target.value)}
+                            className="px-3 py-1.5 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-xs text-slate-700 bg-white font-medium"
+                        >
+                            <option value="all">All Email Status</option>
+                            <option value="sent">Email Sent</option>
+                            <option value="not-sent">Email Not Sent</option>
+                        </select>
+
+                        {/* Clear Filters Button */}
+                        {hasActiveFilters && (
+                            <button
+                                onClick={clearFilters}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-slate-200 hover:bg-slate-50 text-xs font-medium text-slate-600 transition-colors"
+                                type="button"
+                            >
+                                <X size={14} />
+                                Clear Filters
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Results Count */}
+                {hasActiveFilters && (
+                    <div className="text-xs text-slate-500 font-medium mt-3">
+                        Showing {filteredProducts.length} of {products.length} products
+                    </div>
+                )}
+            </div>
+
             {/* Main Table Container: Strict 4-sided grid */}
             <div className="bg-white overflow-hidden shadow-sm border border-slate-200 rounded-sm">
                 {/* Section Header: Compact */}
@@ -215,14 +334,14 @@ const Products = () => {
                         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Active Inventory</h2>
                     </div>
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-2 py-1 border border-slate-200 shadow-sm">
-                        {products.length} Items
+                        {filteredProducts.length} Items
                     </span>
                 </div>
 
                 {/* Table Surface: p-0 to allow internal grid lines to touch edges */}
                 <div className="p-0 overflow-x-auto text-[13px]">
                     <WarrantyList
-                        warranties={products}
+                        warranties={filteredProducts}
                         loading={isLoading}
                         onAdd={handleOpenCreate}
                         onEdit={handleEdit}

@@ -8,6 +8,7 @@ const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const publicRoutes = require('./routes/publicRoutes');
 const { connectDB } = require('./db');
 const { startDailyReminderJob } = require('./jobs/dailyReminderCheck');
 
@@ -43,6 +44,7 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
+app.use('/api/public', publicRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/invoices', invoiceRoutes);

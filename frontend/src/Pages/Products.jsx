@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, PackageSearch } from "lucide-react";
 import useAxios from "../Hooks/useAxios";
 import { uploadImageToImgBB } from "../Utils/UploadImage";
-import { showErrorAlert, showInfoAlert, showConfirmAlert, queueSuccessToast, queueErrorToast } from "../Utils/alerts";
+import { showErrorAlert, showInfoAlert, showConfirmAlert, showTimedSuccessAlert } from "../Utils/alerts";
 import { getAuthErrorMessage } from "../Utils/authErrorMessages";
 import useAuth from "../Hooks/useAuth";
 import WarrantyForm from "../Components/Dashboard/WarrantyForm";
@@ -128,11 +128,14 @@ const Products = () => {
             }
 
             await deleteProductMutation.mutateAsync(product._id);
-            queueSuccessToast("Product deleted", `"${product.productName}" has been removed.`);
+            await showTimedSuccessAlert(
+                "Product deleted",
+                `"${product.productName}" has been removed from your inventory.`
+            );
         } catch (error) {
             console.error(error);
             const message = getAuthErrorMessage(error, "deleting the product");
-            queueErrorToast("Delete failed", message);
+            await showErrorAlert("Delete failed", message);
         }
     };
 
@@ -156,7 +159,7 @@ const Products = () => {
                 invoiceFile,
             });
             setIsFormOpen(false);
-            queueSuccessToast(
+            await showTimedSuccessAlert(
                 editingProduct ? "Product updated" : "Product added",
                 editingProduct
                     ? "Your product has been updated successfully."
@@ -167,7 +170,7 @@ const Products = () => {
             console.error(error);
             const action = editingProduct ? "updating the product" : "creating the product";
             const message = getAuthErrorMessage(error, action);
-            queueErrorToast("Save failed", message);
+            await showErrorAlert("Save failed", message);
         }
     };
 

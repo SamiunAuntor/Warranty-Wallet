@@ -38,6 +38,19 @@ export const showInfoAlert = (title, text) => {
   });
 };
 
+// Auto-closing success alert (for inline success on the same page)
+export const showTimedSuccessAlert = (title, text, timer = 1800) => {
+  return Swal.fire({
+    ...baseConfig,
+    icon: "success",
+    title,
+    text,
+    showConfirmButton: false,
+    timer,
+    timerProgressBar: true,
+  });
+};
+
 // Confirmation alert (returns promise with isConfirmed)
 export const showConfirmAlert = (title, text, confirmText = "Yes", cancelText = "Cancel") => {
   return Swal.fire({

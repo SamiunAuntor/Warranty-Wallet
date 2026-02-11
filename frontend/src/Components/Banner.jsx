@@ -20,9 +20,8 @@ const Banner = () => {
     ];
 
     return (
-        // Full-bleed banner (edge-to-edge). Content itself is free-width,
-        // but we nudge the left text column so it visually aligns with the Navbar logo.
-        <section className="relative w-screen left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] overflow-hidden bg-white border-b border-emerald-50">
+        // Full-width banner aligned with page content, without causing horizontal scroll.
+        <section className="relative w-full overflow-hidden bg-white border-b border-emerald-50">
             <div className="flex flex-col lg:flex-row min-h-[600px] lg:h-[85vh]">
                 
                 {/* MOBILE PHOTO DISPLAY: Photos appear at the top on mobile for visual impact */}

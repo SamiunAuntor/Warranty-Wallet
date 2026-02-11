@@ -199,7 +199,7 @@ const Products = () => {
             </div>
 
             {/* Main Table Container: Strict 4-sided grid */}
-            <div className="bg-white overflow-hidden shadow-sm border border-slate-200">
+            <div className="bg-white overflow-hidden shadow-sm border border-slate-200 rounded-sm">
                 {/* Section Header: Compact */}
                 <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/30">
                     <div className="flex items-center gap-2">

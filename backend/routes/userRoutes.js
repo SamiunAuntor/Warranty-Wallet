@@ -62,12 +62,72 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get current authenticated user profile
+// Get current authenticated user profile (full document)
 router.get('/me', authenticate, async (req, res) => {
   try {
-    return res.json(req.user);
+    const users = await getUsersCollection();
+    const userDoc = await users.findOne({ _id: req.user.id });
+
+    if (!userDoc) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Sanitize response (avoid leaking internal fields if added later)
+    const { _id, password, ...rest } = userDoc;
+
+    return res.json({
+      id: _id,
+      ...rest,
+    });
   } catch (err) {
     console.error('Error fetching current user profile:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Update current authenticated user profile (name, photo)
+router.put('/me', authenticate, async (req, res) => {
+  try {
+    const { name, photoURL } = req.body || {};
+
+    if (!name && !photoURL) {
+      return res.status(400).json({ message: 'Nothing to update.' });
+    }
+
+    const users = await getUsersCollection();
+    const now = new Date();
+
+    const updateDoc = {
+      $set: {
+        updatedAt: now,
+      },
+    };
+
+    if (name) {
+      updateDoc.$set.name = name;
+    }
+    if (photoURL !== undefined) {
+      updateDoc.$set.photoURL = photoURL;
+    }
+
+    await users.updateOne(
+      { _id: req.user.id },
+      updateDoc
+    );
+
+    const updated = await users.findOne({ _id: req.user.id });
+    if (!updated) {
+      return res.status(404).json({ message: 'User not found after update.' });
+    }
+
+    const { _id, password, ...rest } = updated;
+
+    return res.json({
+      id: _id,
+      ...rest,
+    });
+  } catch (err) {
+    console.error('Error updating current user profile:', err);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });

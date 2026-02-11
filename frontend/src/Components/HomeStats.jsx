@@ -17,7 +17,9 @@ const HomeStats = () => {
         totalUsers: 0,
         totalProducts: 0,
         expiringSoonProducts: 0,
+        expiredProducts: 0,
         remindersSent: 0,
+        topCategories: [],
     };
 
     return (
@@ -82,3 +84,4 @@ const StatGroup = ({ label, value, isLoading }) => {
 };
 
 export default HomeStats;
+

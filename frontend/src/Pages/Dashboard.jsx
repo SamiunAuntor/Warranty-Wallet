@@ -50,7 +50,7 @@ const Dashboard = () => {
             </div>
 
             {/* Latest products table */}
-            <div className="bg-white overflow-hidden shadow-sm border border-slate-200">
+            <div className="bg-white overflow-hidden shadow-sm border border-slate-200 rounded-sm">
                 <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/30">
                     <div className="flex items-center gap-2">
                         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Latest Products</h2>
@@ -71,10 +71,10 @@ const Dashboard = () => {
                     </div>
                 ) : (
                     <div className="p-0 overflow-x-auto text-[13px]">
-                        <table className="min-w-full text-[13px] border-collapse bg-white">
+                        <table className="min-w-full text-[13px] border-collapse bg-white rounded-sm overflow-hidden">
                             <thead>
                                 <tr className="text-left text-slate-500 bg-slate-50 uppercase tracking-wider">
-                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Product Name</th>
+                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] rounded-tl-sm">Product Name</th>
                                     <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Brand</th>
                                     <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Category</th>
                                     <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Purchase</th>
@@ -83,7 +83,7 @@ const Dashboard = () => {
                                     <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Expiry</th>
                                     <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Status</th>
                                     <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Email Sent</th>
-                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Invoice</th>
+                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] rounded-tr-sm">Invoice</th>
                                 </tr>
                             </thead>
                             <tbody className="leading-tight">
@@ -113,7 +113,7 @@ const Dashboard = () => {
                                             key={product._id}
                                             className="hover:bg-slate-50/50 transition-colors"
                                         >
-                                            <td className="py-2 px-3 border border-slate-100">
+                                            <td className="py-2 px-3 border border-slate-100 rounded-sm">
                                                 <p className="font-bold text-slate-900 truncate max-w-[140px]">{product.productName || "N/A"}</p>
                                             </td>
                                             <td className="py-2 px-3 border border-slate-100 text-slate-700">{product.brand || "N/A"}</td>
@@ -132,14 +132,14 @@ const Dashboard = () => {
                                             </td>
                                             <td className="py-2 px-3 border border-slate-100">
                                                 <span
-                                                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase border ${statusStyle}`}
+                                                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase border rounded-sm ${statusStyle}`}
                                                 >
                                                     {product.status || "Unknown"}
                                                 </span>
                                             </td>
                                             <td className="py-2 px-3 border border-slate-100">
                                                 <span
-                                                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase ${
+                                                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase rounded-sm ${
                                                         emailSent
                                                             ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                                                             : "bg-slate-50 text-slate-500 border border-dashed border-slate-300"
@@ -148,7 +148,7 @@ const Dashboard = () => {
                                                     {emailSent ? "Sent" : "Not Sent"}
                                                 </span>
                                             </td>
-                                            <td className="py-2 px-3 border border-slate-100 text-center">
+                                            <td className="py-2 px-3 border border-slate-100 text-center rounded-sm">
                                                 {product.invoiceId ? (
                                                     <span className="text-slate-400 text-[10px]">Available</span>
                                                 ) : (

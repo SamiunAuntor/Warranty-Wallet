@@ -58,10 +58,10 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full text-[13px] border-collapse bg-white">
+      <table className="min-w-full text-[13px] border-collapse bg-white rounded-sm overflow-hidden">
         <thead>
           <tr className="text-left text-slate-500 bg-slate-50 uppercase tracking-wider">
-            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Product Name</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] rounded-tl-sm">Product Name</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Brand</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Category</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Purchase</th>
@@ -71,7 +71,7 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Status</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Email Sent</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Invoice</th>
-            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] text-center">Actions</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] text-center rounded-tr-sm">Actions</th>
           </tr>
         </thead>
         <tbody className="leading-tight">
@@ -87,7 +87,7 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                 key={product._id}
                 className="hover:bg-slate-50/50 transition-colors"
               >
-                <td className="py-2 px-3 border border-slate-100">
+                <td className="py-2 px-3 border border-slate-100 rounded-sm">
                   <p className="font-bold text-slate-900 truncate max-w-[140px]">{product.productName || "N/A"}</p>
                 </td>
                 <td className="py-2 px-3 border border-slate-100 text-slate-700">{product.brand || "N/A"}</td>
@@ -106,14 +106,14 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                 </td>
                 <td className="py-2 px-3 border border-slate-100">
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase border ${statusStyle}`}
+                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase border rounded-sm ${statusStyle}`}
                   >
                     {product.status || "Unknown"}
                   </span>
                 </td>
                 <td className="py-2 px-3 border border-slate-100">
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase ${
+                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase rounded-sm ${
                       emailSent
                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                         : "bg-slate-50 text-slate-500 border border-dashed border-slate-300"
@@ -122,11 +122,11 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                     {emailSent ? "Sent" : "Not Sent"}
                   </span>
                 </td>
-                <td className="py-2 px-3 border border-slate-100 text-center">
+                <td className="py-2 px-3 border border-slate-100 text-center rounded-sm">
                   {product.invoiceId ? (
                     <button
                       onClick={() => onViewInvoice && onViewInvoice(product)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-slate-200 text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-colors uppercase"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-slate-200 text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-colors uppercase rounded-sm"
                       type="button"
                     >
                       <FileText size={10} />
@@ -136,7 +136,7 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                     <span className="text-slate-300 text-[10px]">None</span>
                   )}
                 </td>
-                <td className="py-2 px-3 border border-slate-100">
+                <td className="py-2 px-3 border border-slate-100 rounded-sm">
                   <div className="flex items-center justify-center gap-1.5">
                     <button
                       onClick={() => setSelectedProduct(product)}

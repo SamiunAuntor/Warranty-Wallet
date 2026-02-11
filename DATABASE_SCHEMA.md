@@ -56,9 +56,9 @@
   "status": String,                   // "Active" | "Expiring Soon" | "Expired" (auto-updated, indexed)
   "notes": String,                    // Optional user notes
   "invoiceId": ObjectId,              // Reference to invoices._id (optional)
-  "serviceCenterName": String,        // Service center name (optional)
-  "serviceCenterPhone": String,       // Service center contact (optional)
-  "serviceCenterAddress": String,     // Service center address (optional)
+  "shopName": String,                 // Shop / Seller name (optional)
+  "shopPhone": String,                 // Shop / Seller contact phone (optional)
+  "shopAddress": String,               // Shop / Seller address (optional)
   "requiredDocuments": [String],      // Array of required document types (optional)
                                         // e.g., ["Invoice", "Warranty Card", "Product Serial Number"]
   "claimSteps": [String],             // Array of claim preparation steps (optional)

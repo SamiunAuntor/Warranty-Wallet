@@ -88,11 +88,11 @@ const ProductDetailsModal = ({ product, onClose, onViewInvoice }) => {
             />
           </div>
 
-          {/* Service & notes */}
+          {/* Shop & notes */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-4">
-            <InfoRow label="Service Center Name" value={product.serviceCenterName} />
-            <InfoRow label="Service Center Phone" value={product.serviceCenterPhone} />
-            <InfoRow label="Service Center Address" value={product.serviceCenterAddress} />
+            <InfoRow label="Shop / Seller Name" value={product.shopName || product.serviceCenterName} />
+            <InfoRow label="Shop / Seller Phone" value={product.shopPhone || product.serviceCenterPhone} />
+            <InfoRow label="Shop / Seller Address" value={product.shopAddress || product.serviceCenterAddress} />
             <InfoRow label="Internal Notes" value={product.notes} />
           </div>
 

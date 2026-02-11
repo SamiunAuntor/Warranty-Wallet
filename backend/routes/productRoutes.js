@@ -55,10 +55,19 @@ router.post('/', async (req, res) => {
       warrantyDuration,
       warrantyType = 'Manufacturer',
       notes = '',
-      serviceCenterName = '',
-      serviceCenterPhone = '',
-      serviceCenterAddress = '',
+      shopName = '',
+      shopPhone = '',
+      shopAddress = '',
+      // Backward compatibility: also accept old field names
+      serviceCenterName,
+      serviceCenterPhone,
+      serviceCenterAddress,
     } = req.body || {};
+    
+    // Use new field names, fallback to old ones for backward compatibility
+    const finalShopName = shopName || serviceCenterName || '';
+    const finalShopPhone = shopPhone || serviceCenterPhone || '';
+    const finalShopAddress = shopAddress || serviceCenterAddress || '';
 
     if (!productName || !brand || !category || !purchaseDate || !warrantyDuration) {
       return res.status(400).json({ message: 'Missing required product or warranty fields.' });
@@ -86,9 +95,9 @@ router.post('/', async (req, res) => {
       expiringSoonEmailSentForExpiryDate: null,
       notes,
       invoiceId: null,
-      serviceCenterName,
-      serviceCenterPhone,
-      serviceCenterAddress,
+      shopName: finalShopName,
+      shopPhone: finalShopPhone,
+      shopAddress: finalShopAddress,
       createdAt: now,
       updatedAt: now,
       isDeleted: false,
@@ -194,6 +203,10 @@ router.put('/:id', async (req, res) => {
       warrantyDuration,
       warrantyType,
       notes,
+      shopName,
+      shopPhone,
+      shopAddress,
+      // Backward compatibility: also accept old field names
       serviceCenterName,
       serviceCenterPhone,
       serviceCenterAddress,
@@ -210,6 +223,11 @@ router.put('/:id', async (req, res) => {
     if (!existing) {
       return res.status(404).json({ message: 'Product not found.' });
     }
+    
+    // Use new field names, fallback to old ones for backward compatibility
+    const finalShopName = shopName !== undefined ? shopName : (serviceCenterName !== undefined ? serviceCenterName : existing.shopName || existing.serviceCenterName);
+    const finalShopPhone = shopPhone !== undefined ? shopPhone : (serviceCenterPhone !== undefined ? serviceCenterPhone : existing.shopPhone || existing.serviceCenterPhone);
+    const finalShopAddress = shopAddress !== undefined ? shopAddress : (serviceCenterAddress !== undefined ? serviceCenterAddress : existing.shopAddress || existing.serviceCenterAddress);
 
     const updateDoc = {};
 
@@ -218,9 +236,19 @@ router.put('/:id', async (req, res) => {
     if (category !== undefined) updateDoc.category = category;
     if (warrantyType !== undefined) updateDoc.warrantyType = warrantyType;
     if (notes !== undefined) updateDoc.notes = notes;
-    if (serviceCenterName !== undefined) updateDoc.serviceCenterName = serviceCenterName;
-    if (serviceCenterPhone !== undefined) updateDoc.serviceCenterPhone = serviceCenterPhone;
-    if (serviceCenterAddress !== undefined) updateDoc.serviceCenterAddress = serviceCenterAddress;
+    if (shopName !== undefined || serviceCenterName !== undefined) {
+      updateDoc.shopName = finalShopName;
+      // Remove old field if it exists
+      updateDoc.serviceCenterName = undefined;
+    }
+    if (shopPhone !== undefined || serviceCenterPhone !== undefined) {
+      updateDoc.shopPhone = finalShopPhone;
+      updateDoc.serviceCenterPhone = undefined;
+    }
+    if (shopAddress !== undefined || serviceCenterAddress !== undefined) {
+      updateDoc.shopAddress = finalShopAddress;
+      updateDoc.serviceCenterAddress = undefined;
+    }
 
     let purchase = existing.purchaseDate;
     let duration = existing.warrantyDuration;

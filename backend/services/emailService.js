@@ -106,10 +106,10 @@ async function sendExpiringSoonEmail(userEmail, userName, product, daysRemaining
               <span class="label">Days Remaining:</span>
               <span class="value"><strong>${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}</strong></span>
             </div>
-            ${product.serviceCenterName ? `
+            ${(product.shopName || product.serviceCenterName) ? `
             <div class="detail-row">
-              <span class="label">Service Center:</span>
-              <span class="value">${product.serviceCenterName}${product.serviceCenterPhone ? ` (${product.serviceCenterPhone})` : ''}</span>
+              <span class="label">Shop / Seller:</span>
+              <span class="value">${product.shopName || product.serviceCenterName}${(product.shopPhone || product.serviceCenterPhone) ? ` (${product.shopPhone || product.serviceCenterPhone})` : ''}</span>
             </div>
             ` : ''}
           </div>
@@ -149,7 +149,7 @@ Product Details:
 - Category: ${product.category || 'N/A'}
 - Expiry Date: ${expiryDate}
 - Days Remaining: ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}
-${product.serviceCenterName ? `- Service Center: ${product.serviceCenterName}${product.serviceCenterPhone ? ` (${product.serviceCenterPhone})` : ''}` : ''}
+${(product.shopName || product.serviceCenterName) ? `- Shop / Seller: ${product.shopName || product.serviceCenterName}${(product.shopPhone || product.serviceCenterPhone) ? ` (${product.shopPhone || product.serviceCenterPhone})` : ''}` : ''}
 
 ⚠️ Action Required: Your warranty will expire in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}. 
 Make sure to file any claims or schedule service before the expiry date.

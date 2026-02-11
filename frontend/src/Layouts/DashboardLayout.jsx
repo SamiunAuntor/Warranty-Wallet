@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Package, User, LogOut, Menu, X, ShieldCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 import useAuth from '../Hooks/useAuth';
 import { showQueuedToastIfAny, queueSuccessToast } from '../Utils/alerts';
 
@@ -32,6 +33,7 @@ const DashboardLayout = () => {
     ];
 
     return (
+        <>
         <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row relative">
 
             {/* Mobile Navbar - Fixed at top */}
@@ -99,7 +101,8 @@ const DashboardLayout = () => {
                                             ? 'bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100/50'
                                             : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                                         } ${isCollapsed ? 'md:justify-center md:px-0' : ''}`}
-                                    title={isCollapsed ? item.label : ''}
+                                    data-tooltip-id="sidebar-tooltip"
+                                    data-tooltip-content={isCollapsed ? item.label : undefined}
                                 >
                                     <Icon size={20} className="flex-shrink-0" />
                                     <span className={`${isCollapsed ? 'md:hidden' : 'block'} whitespace-nowrap`}>
@@ -130,7 +133,8 @@ const DashboardLayout = () => {
                         <button
                             onClick={handleLogout}
                             className={`w-full mt-3 flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all font-bold text-xs uppercase tracking-tight ${isCollapsed ? 'md:justify-center md:px-0' : ''}`}
-                            title={isCollapsed ? 'Logout' : ''}
+                            data-tooltip-id="sidebar-tooltip"
+                            data-tooltip-content={isCollapsed ? 'Logout' : undefined}
                         >
                             <LogOut size={18} className="flex-shrink-0" />
                             <span className={`${isCollapsed ? 'md:hidden' : 'block'}`}>Logout</span>
@@ -146,6 +150,15 @@ const DashboardLayout = () => {
                 </main>
             </div>
         </div>
+
+        <ReactTooltip
+            id="sidebar-tooltip"
+            place="right"
+            className="!text-[11px] !font-semibold !bg-slate-900 !text-white !rounded-sm"
+            delayShow={300}
+            style={{ zIndex: 9999 }}
+        />
+        </>
     );
 };
 

@@ -9,9 +9,9 @@ const defaultFormState = {
   warrantyDuration: 12,
   warrantyType: "Manufacturer",
   notes: "",
-  serviceCenterName: "",
-  serviceCenterPhone: "",
-  serviceCenterAddress: "",
+  shopName: "",
+  shopPhone: "",
+  shopAddress: "",
 };
 
 const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
@@ -29,9 +29,9 @@ const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
       warrantyDuration: initialData.warrantyDuration || 12,
       warrantyType: initialData.warrantyType || "Manufacturer",
       notes: initialData.notes || "",
-      serviceCenterName: initialData.serviceCenterName || "",
-      serviceCenterPhone: initialData.serviceCenterPhone || "",
-      serviceCenterAddress: initialData.serviceCenterAddress || "",
+      shopName: initialData.shopName || initialData.serviceCenterName || "",
+      shopPhone: initialData.shopPhone || initialData.serviceCenterPhone || "",
+      shopAddress: initialData.shopAddress || initialData.serviceCenterAddress || "",
     };
   });
 
@@ -205,24 +205,31 @@ const WarrantyForm = ({ initialData, onClose, onSubmit, submitting }) => {
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
               <span className="text-[10px] font-black bg-slate-900 text-white px-1.5 py-0.5 rounded-sm">03</span>
               <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
-                Support & Center Info
+                Shop / Seller Info
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <input
                 type="text"
-                value={formValues.serviceCenterName}
-                onChange={(e) => handleChange("serviceCenterName", e.target.value)}
-                placeholder="Service Center Name"
+                value={formValues.shopName}
+                onChange={(e) => handleChange("shopName", e.target.value)}
+                placeholder="Shop / Seller Name"
                 className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700"
               />
               <input
                 type="text"
-                value={formValues.serviceCenterPhone}
-                onChange={(e) => handleChange("serviceCenterPhone", e.target.value)}
-                placeholder="Support Phone Number"
+                value={formValues.shopPhone}
+                onChange={(e) => handleChange("shopPhone", e.target.value)}
+                placeholder="Shop / Seller Phone"
                 className="w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700"
+              />
+              <input
+                type="text"
+                value={formValues.shopAddress}
+                onChange={(e) => handleChange("shopAddress", e.target.value)}
+                placeholder="Shop / Seller Address"
+                className="md:col-span-2 w-full px-3 py-2 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-sm text-slate-700"
               />
               <textarea
                 value={formValues.notes}

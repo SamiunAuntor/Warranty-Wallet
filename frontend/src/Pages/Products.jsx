@@ -39,9 +39,9 @@ const Products = () => {
                 warrantyDuration,
                 warrantyType,
                 notes,
-                serviceCenterName,
-                serviceCenterPhone,
-                serviceCenterAddress,
+                shopName,
+                shopPhone,
+                shopAddress,
             } = formData;
 
             if (!_id && !invoiceFile) {
@@ -60,9 +60,9 @@ const Products = () => {
                 warrantyDuration,
                 warrantyType,
                 notes,
-                serviceCenterName,
-                serviceCenterPhone,
-                serviceCenterAddress,
+                shopName,
+                shopPhone,
+                shopAddress,
             };
 
             let product;
@@ -196,14 +196,14 @@ const Products = () => {
             </div>
 
             {/* Main Table Container: Strict 4-sided grid */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
+            <div className="bg-white overflow-hidden shadow-sm border border-slate-200">
                 {/* Section Header: Compact */}
                 <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/30">
                     <div className="flex items-center gap-2">
                         <PackageSearch className="text-emerald-600" size={18} />
                         <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Active Inventory</h2>
                     </div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-2 py-1 rounded border border-slate-200 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-2 py-1 border border-slate-200 shadow-sm">
                         {products.length} Items
                     </span>
                 </div>

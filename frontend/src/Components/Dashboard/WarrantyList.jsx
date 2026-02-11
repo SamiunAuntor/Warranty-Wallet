@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Plus, Edit2, Trash2, FileText } from "lucide-react";
+import { Plus, Edit2, Trash2, FileText, Info } from "lucide-react";
 import ProductDetailsModal from "./ProductDetailsModal";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const STATUS_COLORS = {
   Active: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -40,12 +41,12 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
 
   if (!warranties || warranties.length === 0) {
     return (
-      <div className="text-center py-10 text-slate-400 text-xs border border-slate-200 rounded-xl m-4">
+      <div className="text-center py-10 text-slate-400 text-xs border border-slate-200 m-4">
         <p className="font-bold mb-1 text-slate-600 uppercase">No products yet</p>
         <p className="mb-4">Add your first product with warranty to get started.</p>
         <button
           onClick={onAdd}
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase shadow-md active:scale-95 transition-all"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs font-black uppercase shadow-md active:scale-95 transition-all"
           type="button"
         >
           <Plus size={14} />
@@ -105,14 +106,14 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                 </td>
                 <td className="py-2 px-3 border border-slate-100">
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-black uppercase border ${statusStyle}`}
+                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase border ${statusStyle}`}
                   >
                     {product.status || "Unknown"}
                   </span>
                 </td>
                 <td className="py-2 px-3 border border-slate-100">
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                    className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase ${
                       emailSent
                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                         : "bg-slate-50 text-slate-500 border border-dashed border-slate-300"
@@ -125,7 +126,7 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                   {product.invoiceId ? (
                     <button
                       onClick={() => onViewInvoice && onViewInvoice(product)}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-slate-200 text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-colors uppercase"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-slate-200 text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-colors uppercase"
                       type="button"
                     >
                       <FileText size={10} />
@@ -139,14 +140,16 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                   <div className="flex items-center justify-center gap-1.5">
                     <button
                       onClick={() => setSelectedProduct(product)}
-                      className="px-2 py-0.5 rounded border border-slate-200 text-[10px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                      className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors"
+                      data-tooltip-id="products-actions-tooltip"
+                      data-tooltip-content="Details"
                       type="button"
                     >
-                      Details
+                      <Info size={14} />
                     </button>
                     <button
                       onClick={() => onEdit && onEdit(product)}
-                      className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                      className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
                       title="Edit"
                       type="button"
                     >
@@ -154,11 +157,11 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                     </button>
                     <button
                       onClick={() => onDelete && onDelete(product)}
-                      className="p-1 rounded hover:bg-rose-50 text-rose-400 hover:text-rose-600 transition-colors"
+                      className="p-1 hover:bg-rose-50 text-rose-400 hover:text-rose-600 transition-colors"
                       title="Delete"
                       type="button"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size= {14} />
                     </button>
                   </div>
                 </td>
@@ -167,6 +170,14 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
           })}
         </tbody>
       </table>
+
+      <ReactTooltip
+        id="products-actions-tooltip"
+        place="top"
+        className="!text-[10px] !font-semibold !bg-slate-900 !text-white !rounded-sm"
+        delayShow={300}
+        style={{ zIndex: 9999 }}
+      />
 
       {selectedProduct && (
         <ProductDetailsModal

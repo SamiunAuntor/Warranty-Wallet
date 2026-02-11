@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import HomeLayout from "./Layouts/HomeLayout";
 import DashboardLayout from "./Layouts/DashboardLayout";
+import AdminLayout from "./Layouts/AdminLayout";
 import HomePage from "./Pages/HomePage";
 import LoginPage from "./Pages/LoginPage";
 import Registration from "./Pages/Registration";
@@ -8,6 +9,8 @@ import ResetPassword from "./Pages/ResetPassword";
 import Dashboard from "./Pages/Dashboard";
 import Products from "./Pages/Products";
 import Profile from "./Pages/Profile";
+import AdminDashboard from "./Pages/AdminDashboard";
+import UserManagement from "./Pages/UserManagement";
 
 const router = createBrowserRouter([
     {
@@ -48,6 +51,20 @@ const router = createBrowserRouter([
             {
                 path: "/dashboard/profile",
                 element: <Profile></Profile>,
+            }
+        ]
+    },
+    {
+        path: "/admin",
+        element: <AdminLayout></AdminLayout>,
+        children: [
+            {
+                index: true,
+                element: <AdminDashboard></AdminDashboard>,
+            },
+            {
+                path: "/admin/users",
+                element: <UserManagement></UserManagement>,
             }
         ]
     }

@@ -62,7 +62,20 @@ const LoginPage = () => {
                 'You have successfully signed in.'
             );
 
-            navigate("/dashboard");
+            // Check user role and redirect accordingly
+            try {
+                const userRes = await axiosSecure.get("/api/users/me");
+                const userRole = userRes.data?.role || "user";
+                
+                if (userRole === "admin") {
+                    navigate("/admin");
+                } else {
+                    navigate("/dashboard");
+                }
+            } catch (error) {
+                // If role check fails, default to dashboard
+                navigate("/dashboard");
+            }
         } catch (err) {
             console.error(err);
             const message = getAuthErrorMessage(err, 'signing you in');
@@ -92,7 +105,20 @@ const LoginPage = () => {
                 'You have successfully signed in.'
             );
 
-            navigate("/dashboard");
+            // Check user role and redirect accordingly
+            try {
+                const userRes = await axiosSecure.get("/api/users/me");
+                const userRole = userRes.data?.role || "user";
+                
+                if (userRole === "admin") {
+                    navigate("/admin");
+                } else {
+                    navigate("/dashboard");
+                }
+            } catch (error) {
+                // If role check fails, default to dashboard
+                navigate("/dashboard");
+            }
         } catch (err) {
             console.error(err);
             const message = getAuthErrorMessage(err, 'signing you in with Google');

@@ -125,10 +125,10 @@ async function sendExpiringSoonEmail(userEmail, userName, product, daysRemaining
             </a>
           </div>
           
-          <p>Thank you for using WarrantyWise!</p>
+          <p>Thank you for using WarrantyWallet!</p>
         </div>
         <div class="footer">
-          <p>This is an automated reminder from WarrantyWise.</p>
+          <p>This is an automated reminder from WarrantyWallet.</p>
           <p>You're receiving this because you have a product with an expiring warranty.</p>
         </div>
       </div>
@@ -156,11 +156,11 @@ Make sure to file any claims or schedule service before the expiry date.
 
 View your product: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard/products
 
-Thank you for using WarrantyWise!
+Thank you for using WarrantyWallet!
   `;
 
   const mailOptions = {
-    from: `"${process.env.EMAIL_FROM_NAME || 'WarrantyWise'}" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+    from: `"${process.env.EMAIL_FROM_NAME || 'WarrantyWallet'}" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
     to: userEmail,
     subject: subject,
     text: textContent,
@@ -185,11 +185,11 @@ Thank you for using WarrantyWise!
  */
 async function sendTestEmail(testEmail) {
   const mailOptions = {
-    from: `"${process.env.EMAIL_FROM_NAME || 'WarrantyWise'}" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+    from: `"${process.env.EMAIL_FROM_NAME || 'WarrantyWallet'}" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
     to: testEmail,
-    subject: 'Test Email from WarrantyWise',
-    text: 'This is a test email from WarrantyWise email service.',
-    html: '<p>This is a <strong>test email</strong> from WarrantyWise email service.</p>',
+    subject: 'Test Email from WarrantyWallet',
+    text: 'This is a test email from WarrantyWallet email service.',
+    html: '<p>This is a <strong>test email</strong> from WarrantyWallet email service.</p>',
   };
 
   try {

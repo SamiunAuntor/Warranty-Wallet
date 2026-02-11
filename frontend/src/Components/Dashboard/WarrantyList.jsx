@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Plus, Edit2, Trash2, FileText } from "lucide-react";
+import ProductDetailsModal from "./ProductDetailsModal";
 
 const STATUS_COLORS = {
   Active: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -28,6 +29,7 @@ const formatDateTime = (date) => {
 };
 
 const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvoice }) => {
+  const [selectedProduct, setSelectedProduct] = useState(null);
   if (loading) {
     return (
       <p className="text-slate-400 text-xs py-10 text-center uppercase tracking-widest font-medium">
@@ -66,10 +68,8 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Type</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Expiry</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Status</th>
-            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Service Center</th>
-            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Notes</th>
+            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Email Sent</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Invoice</th>
-            <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">Created</th>
             <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] text-center">Actions</th>
           </tr>
         </thead>
@@ -78,6 +78,8 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
             const statusStyle =
               STATUS_COLORS[product.status] ||
               "bg-slate-50 text-slate-700 border border-slate-200";
+
+            const emailSent = Boolean(product.expiringSoonEmailSentAt);
 
             return (
               <tr
@@ -108,20 +110,16 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                     {product.status || "Unknown"}
                   </span>
                 </td>
-                <td className="py-2 px-3 border border-slate-100 text-slate-600 max-w-[150px]">
-                  {product.serviceCenterName ? (
-                    <div className="text-[11px]">
-                      <p className="font-bold truncate">{product.serviceCenterName}</p>
-                      <p className="text-slate-400 truncate">{product.serviceCenterPhone}</p>
-                    </div>
-                  ) : (
-                    <span className="text-slate-300">N/A</span>
-                  )}
-                </td>
-                <td className="py-2 px-3 border border-slate-100 text-slate-600 max-w-[120px]">
-                  <p className="text-[11px] truncate italic" title={product.notes}>
-                    {product.notes || "---"}
-                  </p>
+                <td className="py-2 px-3 border border-slate-100">
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                      emailSent
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-slate-50 text-slate-500 border border-dashed border-slate-300"
+                    }`}
+                  >
+                    {emailSent ? "Sent" : "Not Sent"}
+                  </span>
                 </td>
                 <td className="py-2 px-3 border border-slate-100 text-center">
                   {product.invoiceId ? (
@@ -137,11 +135,15 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
                     <span className="text-slate-300 text-[10px]">None</span>
                   )}
                 </td>
-                <td className="py-2 px-3 border border-slate-100 text-slate-400 text-[10px] whitespace-nowrap">
-                  {formatDateTime(product.createdAt)}
-                </td>
                 <td className="py-2 px-3 border border-slate-100">
                   <div className="flex items-center justify-center gap-1.5">
+                    <button
+                      onClick={() => setSelectedProduct(product)}
+                      className="px-2 py-0.5 rounded border border-slate-200 text-[10px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                      type="button"
+                    >
+                      Details
+                    </button>
                     <button
                       onClick={() => onEdit && onEdit(product)}
                       className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
@@ -165,6 +167,14 @@ const WarrantyList = ({ warranties, loading, onAdd, onEdit, onDelete, onViewInvo
           })}
         </tbody>
       </table>
+
+      {selectedProduct && (
+        <ProductDetailsModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onViewInvoice={onViewInvoice}
+        />
+      )}
     </div>
   );
 };

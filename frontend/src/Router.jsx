@@ -2,6 +2,9 @@ import { createBrowserRouter, Navigate } from "react-router";
 import HomeLayout from "./Layouts/HomeLayout";
 import DashboardLayout from "./Layouts/DashboardLayout";
 import AdminLayout from "./Layouts/AdminLayout";
+import PrivateRoute from "./Components/Auth/PrivateRoute";
+import AdminRoute from "./Components/Auth/AdminRoute";
+import PublicRoute from "./Components/Auth/PublicRoute";
 import HomePage from "./Pages/HomePage";
 import LoginPage from "./Pages/LoginPage";
 import Registration from "./Pages/Registration";
@@ -23,22 +26,38 @@ const router = createBrowserRouter([
             },
             {
                 path: "/login",
-                element: <LoginPage></LoginPage>
+                element: (
+                    <PublicRoute>
+                        <LoginPage></LoginPage>
+                    </PublicRoute>
+                )
             },
             {
                 path: "/register",
-                element: <Registration></Registration>
+                element: (
+                    <PublicRoute>
+                        <Registration></Registration>
+                    </PublicRoute>
+                )
             },
             {
                 path: "/reset-password",
-                element: <ResetPassword></ResetPassword>
+                element: (
+                    <PublicRoute>
+                        <ResetPassword></ResetPassword>
+                    </PublicRoute>
+                )
             }
         ]
 
     },
     {
         path: "/dashboard",
-        element: <DashboardLayout></DashboardLayout>,
+        element: (
+            <PrivateRoute>
+                <DashboardLayout></DashboardLayout>
+            </PrivateRoute>
+        ),
         children: [
             {
                 index: true,
@@ -56,7 +75,11 @@ const router = createBrowserRouter([
     },
     {
         path: "/admin",
-        element: <AdminLayout></AdminLayout>,
+        element: (
+            <AdminRoute>
+                <AdminLayout></AdminLayout>
+            </AdminRoute>
+        ),
         children: [
             {
                 index: true,

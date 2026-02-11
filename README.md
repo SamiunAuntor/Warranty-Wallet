@@ -346,12 +346,200 @@ See `SECURITY_IMPLEMENTATION.md` for detailed security documentation.
 ## 📊 Database Schema
 
 The system uses MongoDB with the following collections:
-- `users` - User accounts and authentication data
-- `products` - Products with embedded warranty information
-- `invoices` - Invoice metadata with multiple images array
-- `reminder_logs` - Email reminder audit trail
 
-See `DATABASE_SCHEMA.md` for complete schema documentation.
+### 1. `users` Collection
+
+**Purpose**: Store user account information and authentication data
+
+**Fields**:
+```javascript
+{
+  "_id": ObjectId,                    // MongoDB auto-generated primary key
+  "name": String,                     // User's full name (required)
+  "email": String,                    // User's email (required, unique, indexed)
+  "role": String,                     // "user" | "admin" (default: "user")
+  "status": String,                   // "active" | "suspended" | "deleted" (default: "active")
+  "photoURL": String,                 // Profile photo URL from ImgBB/Firebase (optional)
+  "createdAt": Date,                  // Account creation timestamp
+  "updatedAt": Date,                  // Last update timestamp
+  "lastLoginAt": Date,                // Last login timestamp (optional)
+  "firebaseUID": String               // Firebase Auth UID (optional, for reference)
+}
+```
+
+**Indexes**:
+- `email` (unique)
+
+**Notes**:
+- Users are hard-deleted when status is set to "deleted" (no soft delete)
+- Email is used as the primary lookup key (not `_id`)
+
+---
+
+### 2. `products` Collection
+
+**Purpose**: Store all product records with embedded warranty information
+
+**Fields**:
+```javascript
+{
+  "_id": ObjectId,                    // MongoDB auto-generated primary key
+  "userId": ObjectId,                 // Reference to users._id (required, indexed)
+  "productName": String,              // Product name (required)
+  "brand": String,                    // Brand name (required)
+  "category": String,                 // Product category (required)
+  "purchaseDate": Date,               // Purchase date (required)
+  "warrantyDuration": Number,         // Warranty duration in months (required)
+  "warrantyType": String,             // "Manufacturer" | "Extended" (default: "Manufacturer")
+  "expiryDate": Date,                 // Auto-calculated: purchaseDate + warrantyDuration
+  "status": String,                   // "Active" | "Expiring Soon" | "Expired" (auto-computed)
+  "expiringSoonEmailSentAt": Date,    // Timestamp when expiring soon email was sent (null if not sent)
+  "expiringSoonEmailSentForExpiryDate": Date, // The expiry date for which email was sent
+  "notes": String,                    // Optional user notes
+  "shopName": String,                 // Shop/seller name (optional)
+  "shopPhone": String,                // Shop phone number (optional)
+  "shopAddress": String,              // Shop address (optional)
+  "invoiceId": ObjectId,             // Reference to invoices._id (optional, nullable)
+  "createdAt": Date,                  // Product creation timestamp
+  "updatedAt": Date,                  // Last update timestamp
+  "isDeleted": Boolean                // Soft delete flag (default: false)
+}
+```
+
+**Indexes**:
+- `userId` (for user-specific queries)
+- `status` (for filtering by warranty status)
+- `expiryDate` (for date-based queries)
+
+**Computed Fields**:
+- `expiryDate`: Calculated as `purchaseDate + warrantyDuration` months
+- `status`: Computed based on `expiryDate`:
+  - `"Expired"` if `expiryDate < today`
+  - `"Expiring Soon"` if `expiryDate <= today + 30 days`
+  - `"Active"` otherwise
+
+---
+
+### 3. `invoices` Collection
+
+**Purpose**: Store invoice metadata with multiple images per product
+
+**Fields**:
+```javascript
+{
+  "_id": ObjectId,                    // MongoDB auto-generated primary key
+  "userId": ObjectId,                 // Reference to users._id (required)
+  "productId": ObjectId,              // Reference to products._id (required, 1:1 relationship)
+  "images": [                         // Array of image objects (max 4)
+    {
+      "fileName": String,             // Original file name (required)
+      "fileType": String,             // File extension (e.g., "jpg", "png") (required)
+      "mimeType": String,             // MIME type (e.g., "image/jpeg") (required)
+      "fileSize": Number,             // File size in bytes (required)
+      "storageUrl": String,            // ImageBB URL (required)
+      "storageProvider": String,      // Storage provider (default: "imgbb")
+      "uploadedAt": Date              // Upload timestamp
+    }
+  ],
+  "createdAt": Date,                  // Invoice creation timestamp
+  "updatedAt": Date,                  // Last update timestamp
+  "isDeleted": Boolean                // Soft delete flag (default: false)
+}
+```
+
+**Indexes**:
+- `userId` (for user-specific queries)
+- `productId` (unique, for 1:1 relationship with products)
+
+**Notes**:
+- Maximum 4 images per invoice
+- 1:1 relationship with products (one invoice per product)
+- Images are stored on ImageBB, only metadata is stored in MongoDB
+
+---
+
+### 4. `reminder_logs` Collection
+
+**Purpose**: Audit trail for email reminder actions
+
+**Fields**:
+```javascript
+{
+  "_id": ObjectId,                    // MongoDB auto-generated primary key
+  "productId": ObjectId,              // Reference to products._id (required)
+  "userId": ObjectId,                 // Reference to users._id (required)
+  "reminderType": String,             // "expiring_soon_transition_email" (required)
+  "action": String,                   // "sent" | "failed" (required)
+  "channel": String,                 // "email" (required)
+  "errorMessage": String,            // Error message if action is "failed" (optional)
+  "timestamp": Date                  // When the action occurred (required)
+}
+```
+
+**Indexes**:
+- `productId` (for product-specific queries)
+- `userId` (for user-specific queries)
+- `action` (for filtering sent/failed reminders)
+- `timestamp` (for date-based queries)
+
+**Notes**:
+- Used for tracking email delivery status
+- Helps with debugging and analytics
+- Records both successful sends and failures
+
+---
+
+### 5. `reminders` Collection
+
+**Purpose**: Store scheduled reminder records (currently used for future enhancements)
+
+**Fields**:
+```javascript
+{
+  "_id": ObjectId,                    // MongoDB auto-generated primary key
+  "productId": ObjectId,              // Reference to products._id (required)
+  "userId": ObjectId,                 // Reference to users._id (required)
+  "scheduledDate": Date,              // When the reminder should be sent (required)
+  "reminderType": String,             // "30_days" | "7_days" | "expiry_date"
+  "status": String,                   // "pending" | "sent" | "failed"
+  "createdAt": Date,                  // Reminder creation timestamp
+  "updatedAt": Date                   // Last update timestamp
+}
+```
+
+**Notes**:
+- Currently, the system uses a simpler approach: emails are sent when products transition to "Expiring Soon" status
+- This collection is available for future enhancements (e.g., multiple reminder schedules)
+
+---
+
+## Relationships
+
+```
+users (1) ──< (many) products
+products (1) ──< (1) invoices
+products (1) ──< (many) reminder_logs
+products (1) ──< (many) reminders
+```
+
+**Key Relationships**:
+- One user can have many products
+- One product can have one invoice (1:1)
+- One product can have many reminder logs (for audit trail)
+- One product can have many reminders (for future scheduling)
+
+---
+
+## Data Flow
+
+1. **User Registration/Login**: User document is created/updated in `users` collection
+2. **Product Creation**: Product document is created in `products` collection with computed `expiryDate` and `status`
+3. **Invoice Upload**: Invoice document is created/updated in `invoices` collection, and `product.invoiceId` is set
+4. **Daily Reminder Job**: 
+   - Scans all products
+   - Updates `status` if needed
+   - Sends email if product is "Expiring Soon" and email not yet sent
+   - Logs action in `reminder_logs`
 
 ---
 

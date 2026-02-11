@@ -81,6 +81,9 @@ router.post('/', async (req, res) => {
       warrantyType,
       expiryDate,
       status,
+      // Email reminder tracking for Active → Expiring Soon transition
+      expiringSoonEmailSentAt: null,
+      expiringSoonEmailSentForExpiryDate: null,
       notes,
       invoiceId: null,
       serviceCenterName,
@@ -113,10 +116,6 @@ router.get('/', async (req, res) => {
       isDeleted: { $ne: true },
     };
 
-    if (status) {
-      filter.status = status;
-    }
-
     if (category) {
       filter.category = category;
     }
@@ -131,28 +130,20 @@ router.get('/', async (req, res) => {
       .sort({ expiryDate: 1 })
       .toArray();
 
-    // Refresh status based on current date if necessary
-    const now = new Date();
-    const updates = [];
+    // IMPORTANT:
+    // We do NOT persist status refresh here, because status transitions are used
+    // by the backend daily job to trigger "Active → Expiring Soon" emails.
+    // We still compute the current status for correct UI display.
+    const withComputedStatus = docs.map((p) => ({
+      ...p,
+      status: computeStatus(p.expiryDate),
+    }));
 
-    for (const p of docs) {
-      const newStatus = computeStatus(p.expiryDate);
-      if (newStatus !== p.status) {
-        updates.push(
-          products.updateOne(
-            { _id: p._id },
-            { $set: { status: newStatus, updatedAt: now } }
-          )
-        );
-        p.status = newStatus;
-      }
-    }
+    const filtered = status
+      ? withComputedStatus.filter((p) => p.status === status)
+      : withComputedStatus;
 
-    if (updates.length) {
-      await Promise.all(updates);
-    }
-
-    return res.json(docs);
+    return res.json(filtered);
   } catch (error) {
     console.error('Error fetching products:', error);
     return res.status(500).json({ message: 'Failed to fetch products.' });
@@ -246,8 +237,16 @@ router.put('/:id', async (req, res) => {
 
     if (purchaseDate !== undefined || warrantyDuration !== undefined) {
       const newExpiry = computeExpiryDate(purchase, duration);
+      const newStatus = computeStatus(newExpiry);
       updateDoc.expiryDate = newExpiry;
-      updateDoc.status = computeStatus(newExpiry);
+      updateDoc.status = newStatus;
+
+      // If a user extends/changes warranty such that product becomes Active again,
+      // allow future Expiring Soon transition emails for the new expiry date.
+      if (newStatus === 'Active') {
+        updateDoc.expiringSoonEmailSentAt = null;
+        updateDoc.expiringSoonEmailSentForExpiryDate = null;
+      }
     }
 
     updateDoc.updatedAt = new Date();
@@ -300,5 +299,6 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
 
 

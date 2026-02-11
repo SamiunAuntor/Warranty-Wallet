@@ -42,19 +42,16 @@ const router = createBrowserRouter([
                 element: <Dashboard></Dashboard>,
             },
             {
-                path: "products",
-                element: <Products></Products>
+                path: "/dashboard/products",
+                element: <Products></Products>,
             },
             {
-                path: "profile",
-                element: <Profile></Profile>
+                path: "/dashboard/profile",
+                element: <Profile></Profile>,
             }
         ]
-    },
-    {
-        path: "*",
-        element: <h1>Page Not Found</h1>
     }
-])
+]);
 
 export default router;
+

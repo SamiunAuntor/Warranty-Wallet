@@ -2,7 +2,7 @@
 node_modules/
 
 # Environment variables
-/backend/warranty-wallet-firebase-adminsdk.json
+warranty-wallet-firebase-adminsdk.json
 .env
 .env.*
 

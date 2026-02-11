@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, PackageSearch, Search, Filter, X } from "lucide-react";
+import { Plus, PackageSearch, Search, Filter, X, Download } from "lucide-react";
 import useAxios from "../Hooks/useAxios";
 import { uploadImageToImgBB } from "../Utils/UploadImage";
 import { showErrorAlert, showInfoAlert, showConfirmAlert, showTimedSuccessAlert } from "../Utils/alerts";
 import { getAuthErrorMessage } from "../Utils/authErrorMessages";
 import useAuth from "../Hooks/useAuth";
+import { exportProductsToPDF } from "../Utils/exportToPDF";
 import WarrantyForm from "../Components/Dashboard/WarrantyForm";
 import WarrantyList from "../Components/Dashboard/WarrantyList";
 import InvoiceModal from "../Components/Dashboard/InvoiceModal";
@@ -238,6 +239,27 @@ const Products = () => {
         setEmailSentFilter("all");
     };
 
+    const handleExportPDF = () => {
+        if (filteredProducts.length === 0) {
+            showInfoAlert(
+                "No products to export",
+                "Please add products or adjust your filters to export data."
+            );
+            return;
+        }
+
+        exportProductsToPDF(filteredProducts, {
+            searchQuery,
+            statusFilter,
+            emailSentFilter,
+        });
+
+        showTimedSuccessAlert(
+            "PDF Exported",
+            `Successfully exported ${filteredProducts.length} product(s) to PDF.`
+        );
+    };
+
     return (
         <div className="space-y-6 w-full">
             {/* Header: Reduced font and padding */}
@@ -248,14 +270,26 @@ const Products = () => {
                         Manage your product warranties and digital invoices in one place.
                     </p>
                 </div>
-                <button
-                    onClick={handleOpenCreate}
-                    className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-tight shadow-sm active:scale-95 transition-all whitespace-nowrap"
-                    type="button"
-                >
-                    <Plus size={16} />
-                    Add Product
-                </button>
+                <div className="flex items-center gap-2">
+                    {filteredProducts.length > 0 && (
+                        <button
+                            onClick={handleExportPDF}
+                            className="inline-flex items-center justify-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-sm text-xs font-black uppercase tracking-tight shadow-sm active:scale-95 transition-all whitespace-nowrap"
+                            type="button"
+                        >
+                            <Download size={16} />
+                            Export PDF
+                        </button>
+                    )}
+                    <button
+                        onClick={handleOpenCreate}
+                        className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-sm text-xs font-black uppercase tracking-tight shadow-sm active:scale-95 transition-all whitespace-nowrap"
+                        type="button"
+                    >
+                        <Plus size={16} />
+                        Add Product
+                    </button>
+                </div>
             </div>
 
             {/* Search and Filter Bar */}

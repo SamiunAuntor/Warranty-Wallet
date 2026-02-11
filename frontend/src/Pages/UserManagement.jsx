@@ -33,7 +33,7 @@ const UserManagement = () => {
             if (newStatus === "suspended") {
                 confirmMessage = `Are you sure you want to suspend "${user.name}"? They will not be able to access the platform.`;
             } else if (newStatus === "deleted") {
-                confirmMessage = `Are you sure you want to delete "${user.name}"? This action cannot be undone.`;
+                confirmMessage = `⚠️ WARNING: Are you sure you want to permanently delete "${user.name}"? This will permanently remove the user from the database and cannot be undone. The user's products and invoices will remain in the system.`;
             } else if (newStatus === "active") {
                 confirmMessage = `Are you sure you want to activate "${user.name}"?`;
             }
@@ -56,9 +56,13 @@ const UserManagement = () => {
                 status: newStatus,
             });
 
+            const successMessage = newStatus === "deleted" 
+                ? "User has been permanently deleted from the database."
+                : `User status has been updated to ${newStatus}.`;
+            
             await showTimedSuccessAlert(
-                "Status Updated",
-                `User status has been updated to ${newStatus}.`
+                newStatus === "deleted" ? "User Deleted" : "Status Updated",
+                successMessage
             );
         } catch (error) {
             console.error(error);

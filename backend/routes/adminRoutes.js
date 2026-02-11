@@ -23,7 +23,7 @@ router.get('/stats', async (req, res) => {
     const invoices = await getInvoicesCollection();
 
     const baseProductMatch = { isDeleted: { $ne: true } };
-    const baseUserMatch = { isDeleted: { $ne: true } };
+    // Note: Users are hard deleted, so no need to filter by isDeleted
 
     const [
       totalUsers,
@@ -38,9 +38,9 @@ router.get('/stats', async (req, res) => {
       recentUsers,
       topCategories,
     ] = await Promise.all([
-      users.countDocuments(baseUserMatch),
-      users.countDocuments({ ...baseUserMatch, status: 'active' }),
-      users.countDocuments({ ...baseUserMatch, status: 'suspended' }),
+      users.countDocuments({}),
+      users.countDocuments({ status: 'active' }),
+      users.countDocuments({ status: 'suspended' }),
       products.countDocuments(baseProductMatch),
       products.countDocuments({ ...baseProductMatch, status: 'Active' }),
       products.countDocuments({ ...baseProductMatch, status: 'Expiring Soon' }),
@@ -48,7 +48,7 @@ router.get('/stats', async (req, res) => {
       reminderLogs.countDocuments({ action: 'sent', channel: 'email' }),
       invoices.countDocuments({ isDeleted: { $ne: true } }),
       users
-        .find(baseUserMatch)
+        .find({})
         .sort({ createdAt: -1 })
         .limit(5)
         .toArray(),
@@ -75,7 +75,6 @@ router.get('/stats', async (req, res) => {
       .aggregate([
         {
           $match: {
-            ...baseUserMatch,
             createdAt: { $gte: sevenDaysAgo },
           },
         },
@@ -126,7 +125,7 @@ router.get('/users', async (req, res) => {
   try {
     const users = await getUsersCollection();
     const userList = await users
-      .find({ isDeleted: { $ne: true } })
+      .find({})
       .sort({ createdAt: -1 })
       .toArray();
 
@@ -163,16 +162,17 @@ router.put('/users/:id/status', async (req, res) => {
       return res.status(400).json({ message: 'You cannot delete your own account.' });
     }
 
+    // Hard delete user if status is 'deleted'
+    if (status === 'deleted') {
+      await users.deleteOne({ _id: new ObjectId(id) });
+      return res.json({ message: 'User permanently deleted successfully.' });
+    }
+
+    // Update user status for active/suspended
     const updateData = {
       status,
       updatedAt: new Date(),
     };
-
-    if (status === 'deleted') {
-      updateData.isDeleted = true;
-    } else {
-      updateData.isDeleted = false;
-    }
 
     await users.updateOne(
       { _id: new ObjectId(id) },

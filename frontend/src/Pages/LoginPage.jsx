@@ -32,7 +32,29 @@ const LoginPage = () => {
             console.error('Error details:', error.response?.data || error.message);
             // Don't throw - allow login to complete even if backend sync fails
             // But log it so we can debug
+            return null;
         }
+    };
+
+    const checkUserRole = async (retries = 3) => {
+        for (let i = 0; i < retries; i++) {
+            try {
+                // Wait a bit for backend to process the sync (longer wait on first attempt)
+                await new Promise(resolve => setTimeout(resolve, i === 0 ? 1000 : 500));
+                const userRes = await axiosSecure.get("/api/users/me");
+                const role = userRes.data?.role || "user";
+                if (role) {
+                    return role;
+                }
+            } catch (error) {
+                console.error(`Error checking user role (attempt ${i + 1}/${retries}):`, error);
+                if (i === retries - 1) {
+                    // Last attempt failed, default to user
+                    return "user";
+                }
+            }
+        }
+        return "user"; // Default to user if all attempts fail
     };
 
     const handleEmailLogin = async (e) => {
@@ -50,7 +72,7 @@ const LoginPage = () => {
             const result = await loginUserWithEmailPassword(email, password);
             const fbUser = result.user;
 
-            await syncUserToBackend({
+            const syncResult = await syncUserToBackend({
                 name: fbUser.displayName || "User",
                 email: fbUser.email,
                 photoURL: fbUser.photoURL || "",
@@ -63,17 +85,14 @@ const LoginPage = () => {
             );
 
             // Check user role and redirect accordingly
-            try {
-                const userRes = await axiosSecure.get("/api/users/me");
-                const userRole = userRes.data?.role || "user";
-                
-                if (userRole === "admin") {
-                    navigate("/admin");
-                } else {
-                    navigate("/dashboard");
-                }
-            } catch (error) {
-                // If role check fails, default to dashboard
+            const userRole = await checkUserRole();
+            console.log('🔍 Detected user role:', userRole);
+            
+            if (userRole === "admin") {
+                console.log('✅ Redirecting admin to /admin');
+                navigate("/admin");
+            } else {
+                console.log('✅ Redirecting user to /dashboard');
                 navigate("/dashboard");
             }
         } catch (err) {
@@ -93,7 +112,7 @@ const LoginPage = () => {
             const result = await loginWithGoogle();
             const fbUser = result.user;
 
-            await syncUserToBackend({
+            const syncResult = await syncUserToBackend({
                 name: fbUser.displayName || "Google User",
                 email: fbUser.email,
                 photoURL: fbUser.photoURL || "",
@@ -106,17 +125,14 @@ const LoginPage = () => {
             );
 
             // Check user role and redirect accordingly
-            try {
-                const userRes = await axiosSecure.get("/api/users/me");
-                const userRole = userRes.data?.role || "user";
-                
-                if (userRole === "admin") {
-                    navigate("/admin");
-                } else {
-                    navigate("/dashboard");
-                }
-            } catch (error) {
-                // If role check fails, default to dashboard
+            const userRole = await checkUserRole();
+            console.log('🔍 Detected user role:', userRole);
+            
+            if (userRole === "admin") {
+                console.log('✅ Redirecting admin to /admin');
+                navigate("/admin");
+            } else {
+                console.log('✅ Redirecting user to /dashboard');
                 navigate("/dashboard");
             }
         } catch (err) {

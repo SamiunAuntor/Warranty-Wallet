@@ -63,26 +63,28 @@ const AdminRoute = ({ children }) => {
                     return;
                 }
 
-                // Verify admin access with backend admin endpoint
+                // Verify admin access with backend admin endpoint (optional check)
+                // If role is admin from /api/users/me, we trust it
+                // Only deny if we get a 403 (explicit denial)
                 try {
                     await axiosSecure.get('/api/admin/stats');
                     // If successful, user is authorized admin
                     setIsAuthorized(true);
                 } catch (adminError) {
-                    // If admin endpoint fails, user is not admin
+                    // Only deny access if we get 403 (explicit denial)
                     if (adminError.response?.status === 403) {
                         await showErrorAlert(
                             'Admin Access Denied',
                             'Your admin privileges have been revoked. Please contact support.'
                         );
                         await logoutUser();
+                        setIsAuthorized(false);
                     } else {
-                        await showErrorAlert(
-                            'Access Verification Failed',
-                            'Unable to verify admin access. Please try again.'
-                        );
+                        // For other errors (500, network, etc.), trust the role check
+                        // The role was already verified as 'admin' from /api/users/me
+                        console.warn('Admin endpoint check failed, but role is admin. Allowing access:', adminError.response?.status || adminError.message);
+                        setIsAuthorized(true);
                     }
-                    setIsAuthorized(false);
                 }
                 setIsChecking(false);
             } catch (error) {

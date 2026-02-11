@@ -39,22 +39,18 @@ router.post('/', async (req, res) => {
     }
 
     console.log('🔄 Attempting to upsert user with email:', email);
-    const result = await users.findOneAndUpdate(
-      { email },
-      updateDoc,
-      {
-        upsert: true,
-        returnDocument: 'after',
-      }
-    );
+    // Use updateOne + findOne instead of findOneAndUpdate to avoid driver edge cases
+    await users.updateOne({ email }, updateDoc, { upsert: true });
 
-    if (result.value) {
-      console.log('✅ User successfully saved/updated in database:', result.value._id);
-      return res.status(200).json(result.value);
-    } else {
-      console.error('❌ No document returned from findOneAndUpdate');
+    const userDoc = await users.findOne({ email });
+
+    if (!userDoc) {
+      console.error('❌ No document returned after upsert for email:', email);
       return res.status(500).json({ message: 'Failed to save user' });
     }
+
+    console.log('✅ User successfully saved/updated in database:', userDoc._id);
+    return res.status(200).json(userDoc);
   } catch (err) {
     console.error('❌ Error syncing user:', err);
     console.error('Error stack:', err.stack);

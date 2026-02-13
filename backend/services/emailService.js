@@ -120,7 +120,7 @@ async function sendExpiringSoonEmail(userEmail, userName, product, daysRemaining
           </div>
           
           <div style="text-align: center;">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard/products" class="cta-button">
+            <a href="${process.env.FRONTEND_URL || 'https://warranty-wallet-ad400.web.app/'}/dashboard/products" class="cta-button">
               View Product Details
             </a>
           </div>

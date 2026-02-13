@@ -10,13 +10,17 @@ WarrantyWallet is a comprehensive web-based platform that helps users digitally 
 
 ## 🎯 Project Overview
 
-WarrantyWallet transforms scattered warranty documents into a secure, intelligent, and actionable system—ensuring you never miss a repair window or warranty benefit you're entitled to.
+### ⚠️ The Problem
+Managing warranties for multiple products is often a chaotic process. Physical invoices get lost, digital receipts are buried in emails, and warranty expiration dates are easily forgotten. This leads to missed repair windows, expired benefits, and unnecessary financial loss when products fail.
 
-### Key Value Proposition
-- **Never lose a warranty benefit again** - All your warranty information in one secure place
-- **Smart automated reminders** - Get notified before warranties expire
-- **Claim-ready documentation** - Store invoices and warranty cards digitally
-- **Admin management** - Complete platform oversight for administrators
+### 💡 The Solution
+**WarrantyWallet** transforms this scattered mess into a secure, intelligent, and actionable system. It provides a central vault for all purchase documents and automates the tracking process, ensuring you're always claim-ready and never miss a warranty benefit you're entitled to.
+
+### 🚀 Key Value Proposition
+- **Centralized Vault** - All your warranty information and invoices in one secure place.
+- **Automated Reminders** - Smart email notifications before warranties expire.
+- **Claim-Ready Status** - Instant access to digital invoices when you need to file a claim.
+- **Platform Oversight** - Comprehensive admin tools for user and system management.
 
 ---
 

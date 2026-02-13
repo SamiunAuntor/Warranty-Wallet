@@ -63,7 +63,7 @@ const Navbar = () => {
                                         <img
                                             src={user.photoURL}
                                             alt={user.displayName || 'User'}
-                                            className="w-10 h-10 rounded-full border-2 border-emerald-600 object-cover"
+                                            className="w-8 h-8 rounded-full  object-cover"
                                         />
                                     ) : (
                                         <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold">
@@ -75,7 +75,7 @@ const Navbar = () => {
                                     onClick={handleLogout}
                                     className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-red-600 transition-colors px-4 py-2 rounded-lg hover:bg-red-50"
                                 >
-                                    <LogOut size={18} />
+                                    <LogOut size={20} />
                                     Logout
                                 </button>
                             </>

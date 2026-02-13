@@ -31,7 +31,11 @@ const HomeLayout = () => {
             <Navbar />
 
             {/* Full-width main so the banner can be edge-to-edge; individual sections handle their own width (e.g., w-11/12 mx-auto) */}
-            <main className="flex-grow w-full pt-0 pb-20">
+            <main
+                className={`flex-grow w-full pt-0 ${
+                    location.pathname === "/" ? "pb-0" : "pb-20"
+                }`}
+            >
                 {/* This is where the Landing Page, Login, 
                     and Register components will render. 
                 */}

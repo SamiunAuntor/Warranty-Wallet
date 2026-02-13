@@ -74,14 +74,7 @@ const HowItWorks = () => {
                     ))}
                 </div>
 
-                <div className="text-center mt-12">
-                    <Link 
-                        to="/register"
-                        className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-sm font-bold text-sm uppercase tracking-tight transition-all shadow-md active:scale-95"
-                    >
-                        Start Now
-                    </Link>
-                </div>
+                
             </div>
         </section>
     );

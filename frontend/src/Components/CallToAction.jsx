@@ -35,9 +35,7 @@ const CallToAction = () => {
                     </Link>
                 </div>
 
-                <p className="text-sm text-emerald-100 mt-6">
-                    ✓ Free forever  ✓ No credit card  ✓ Setup in 2 minutes
-                </p>
+                
             </div>
         </section>
     );

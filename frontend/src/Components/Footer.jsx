@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
@@ -25,9 +26,30 @@ const Footer = () => {
                     <div className="text-center md:text-left">
                         <h4 className="font-bold text-slate-800 mb-6 text-sm uppercase tracking-wider">Product</h4>
                         <ul className="space-y-3 text-sm text-slate-600">
-                            <li className="hover:text-emerald-600 cursor-pointer transition-colors">Digital Vault</li>
-                            <li className="hover:text-emerald-600 cursor-pointer transition-colors">Admin Access</li>
-                            <li className="hover:text-emerald-600 cursor-pointer transition-colors">AI OCR Scanner</li>
+                            <li>
+                                <Link
+                                    to="/dashboard"
+                                    className="hover:text-emerald-600 transition-colors"
+                                >
+                                    Digital Vault
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/admin"
+                                    className="hover:text-emerald-600 transition-colors"
+                                >
+                                    Admin Access
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/dashboard/products"
+                                    className="hover:text-emerald-600 transition-colors"
+                                >
+                                    AI OCR Scanner
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 
@@ -35,9 +57,30 @@ const Footer = () => {
                     <div className="text-center md:text-left">
                         <h4 className="font-bold text-slate-800 mb-6 text-sm uppercase tracking-wider">Support</h4>
                         <ul className="space-y-3 text-sm text-slate-600">
-                            <li className="hover:text-emerald-600 cursor-pointer transition-colors">Help Center</li>
-                            <li className="hover:text-emerald-600 cursor-pointer transition-colors">Privacy</li>
-                            <li className="hover:text-emerald-600 cursor-pointer transition-colors">Terms</li>
+                            <li>
+                                <a
+                                    href="/#faq"
+                                    className="hover:text-emerald-600 transition-colors"
+                                >
+                                    Help Center
+                                </a>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/privacy"
+                                    className="hover:text-emerald-600 transition-colors"
+                                >
+                                    Privacy
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/terms"
+                                    className="hover:text-emerald-600 transition-colors"
+                                >
+                                    Terms
+                                </Link>
+                            </li>
                         </ul>
                     </div>
                 </div>

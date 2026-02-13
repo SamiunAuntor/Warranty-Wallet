@@ -14,6 +14,8 @@ import Products from "./Pages/Products";
 import Profile from "./Pages/Profile";
 import AdminDashboard from "./Pages/AdminDashboard";
 import UserManagement from "./Pages/UserManagement";
+import Privacy from "./Pages/Privacy";
+import Terms from "./Pages/Terms";
 
 const router = createBrowserRouter([
     {
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
                         <ResetPassword></ResetPassword>
                     </PublicRoute>
                 )
+            },
+            {
+                path: "/privacy",
+                element: <Privacy />,
+            },
+            {
+                path: "/terms",
+                element: <Terms />,
             }
         ]
 

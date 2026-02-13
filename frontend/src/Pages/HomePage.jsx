@@ -3,7 +3,6 @@ import Banner from '../Components/Banner';
 import HomeStats from '../Components/HomeStats';
 import HowItWorks from '../Components/HowItWorks';
 import Features from '../Components/Features';
-import Benefits from '../Components/Benefits';
 import FAQ from '../Components/FAQ';
 import CallToAction from '../Components/CallToAction';
 
@@ -14,7 +13,6 @@ const HomePage = () => {
             <HomeStats />
             <HowItWorks />
             <Features />
-            <Benefits />
             <FAQ />
             <CallToAction />
         </div>

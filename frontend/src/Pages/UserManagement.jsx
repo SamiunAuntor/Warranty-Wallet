@@ -10,12 +10,14 @@ const UserManagement = () => {
     const queryClient = useQueryClient();
     const [selectedUserId, setSelectedUserId] = useState(null);
 
-    // Local UI state for searching, filtering, and sorting
+    // Local UI state for searching, filtering, sorting, and pagination
     const [searchTerm, setSearchTerm] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [sortBy, setSortBy] = useState("name"); // name | createdAt | role | status
     const [sortDirection, setSortDirection] = useState("asc"); // asc | desc
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 10;
 
     const { data: users = [], isLoading } = useQuery({
         queryKey: ["admin-users"],
@@ -182,6 +184,25 @@ const UserManagement = () => {
         return result;
     }, [users, searchTerm, roleFilter, statusFilter, sortBy, sortDirection]);
 
+    // Reset to first page when filters/search/sort change
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, roleFilter, statusFilter, sortBy, sortDirection]);
+
+    // Pagination calculations
+    const totalPages = React.useMemo(() => {
+        if (!filteredUsers || filteredUsers.length === 0) return 1;
+        return Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+    }, [filteredUsers, ITEMS_PER_PAGE]);
+
+    const paginatedUsers = React.useMemo(() => {
+        if (!filteredUsers) return [];
+        const safePage = Math.min(Math.max(currentPage, 1), totalPages);
+        const startIndex = (safePage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        return filteredUsers.slice(startIndex, endIndex);
+    }, [filteredUsers, currentPage, totalPages, ITEMS_PER_PAGE]);
+
     if (isLoading) {
         return (
             <p className="text-slate-400 text-xs py-10 text-center uppercase tracking-widest font-medium">
@@ -347,89 +368,160 @@ const UserManagement = () => {
                         <p>Try adjusting your search text or filters.</p>
                     </div>
                 ) : (
-                    <div className="p-0 overflow-x-auto text-[13px]">
-                        <table className="min-w-full text-[13px] border-collapse bg-white rounded-sm overflow-hidden">
-                            <thead>
-                                <tr className="text-left text-slate-500 bg-slate-50 uppercase tracking-wider">
-                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] rounded-tl-sm">
-                                        User
-                                    </th>
-                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">
-                                        Email
-                                    </th>
-                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">
-                                        Role
-                                    </th>
-                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">
-                                        Status
-                                    </th>
-                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">
-                                        Member Since
-                                    </th>
-                                    <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] rounded-tr-sm text-center">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="leading-tight">
-                                {filteredUsers.map((user) => (
-                                    <tr
-                                        key={user._id}
-                                        className="hover:bg-slate-50/50 transition-colors"
-                                    >
-                                        <td className="py-2 px-3 border border-slate-100 rounded-sm">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                                                    {user.photoURL ? (
-                                                        <img
-                                                            src={user.photoURL}
-                                                            alt={user.name}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full bg-emerald-600 flex items-center justify-center text-white font-bold text-xs">
-                                                            {user.name?.[0]?.toUpperCase() || "U"}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <span className="font-bold text-slate-900">
-                                                    {user.name || "N/A"}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="py-2 px-3 border border-slate-100 text-slate-700">
-                                            {user.email || "N/A"}
-                                        </td>
-                                        <td className="py-2 px-3 border border-slate-100">
-                                            {getRoleBadge(user.role)}
-                                        </td>
-                                        <td className="py-2 px-3 border border-slate-100">
-                                            {getStatusBadge(user.status)}
-                                        </td>
-                                        <td className="py-2 px-3 border border-slate-100 text-slate-600 whitespace-nowrap">
-                                            {formatDate(user.createdAt)}
-                                        </td>
-                                        <td className="py-2 px-3 border border-slate-100 rounded-sm">
-                                            <div className="flex items-center justify-center">
-                                                <select
-                                                    value={user.status}
-                                                    onChange={(e) =>
-                                                        handleStatusChange(user, e.target.value)
-                                                    }
-                                                    disabled={updateStatusMutation.isPending}
-                                                    className="px-2 py-1 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-xs text-slate-700 bg-white font-medium disabled:opacity-50"
-                                                >
-                                                    <option value="active">Active</option>
-                                                    <option value="suspended">Suspended</option>
-                                                    <option value="deleted">Deleted</option>
-                                                </select>
-                                            </div>
-                                        </td>
+                    <>
+                        <div className="p-0 overflow-x-auto text-[13px]">
+                            <table className="min-w-full text-[13px] border-collapse bg-white rounded-sm overflow-hidden">
+                                <thead>
+                                    <tr className="text-left text-slate-500 bg-slate-50 uppercase tracking-wider">
+                                        <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] rounded-tl-sm">
+                                            User
+                                        </th>
+                                        <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">
+                                            Email
+                                        </th>
+                                        <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">
+                                            Role
+                                        </th>
+                                        <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">
+                                            Status
+                                        </th>
+                                        <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px]">
+                                            Member Since
+                                        </th>
+                                        <th className="py-2.5 px-3 font-black border border-slate-200 text-[10px] rounded-tr-sm text-center">
+                                            Actions
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="leading-tight">
+                                    {paginatedUsers.map((user) => (
+                                        <tr
+                                            key={user._id}
+                                            className="hover:bg-slate-50/50 transition-colors"
+                                        >
+                                            <td className="py-2 px-3 border border-slate-100 rounded-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                                                        {user.photoURL ? (
+                                                            <img
+                                                                src={user.photoURL}
+                                                                alt={user.name}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-emerald-600 flex items-center justify-center text-white font-bold text-xs">
+                                                                {user.name?.[0]?.toUpperCase() || "U"}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <span className="font-bold text-slate-900">
+                                                        {user.name || "N/A"}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="py-2 px-3 border border-slate-100 text-slate-700">
+                                                {user.email || "N/A"}
+                                            </td>
+                                            <td className="py-2 px-3 border border-slate-100">
+                                                {getRoleBadge(user.role)}
+                                            </td>
+                                            <td className="py-2 px-3 border border-slate-100">
+                                                {getStatusBadge(user.status)}
+                                            </td>
+                                            <td className="py-2 px-3 border border-slate-100 text-slate-600 whitespace-nowrap">
+                                                {formatDate(user.createdAt)}
+                                            </td>
+                                            <td className="py-2 px-3 border border-slate-100 rounded-sm">
+                                                <div className="flex items-center justify-center">
+                                                    <select
+                                                        value={user.status}
+                                                        onChange={(e) =>
+                                                            handleStatusChange(user, e.target.value)
+                                                        }
+                                                        disabled={updateStatusMutation.isPending}
+                                                        className="px-2 py-1 rounded-sm border border-slate-200 focus:border-slate-900 outline-none text-xs text-slate-700 bg-white font-medium disabled:opacity-50"
+                                                    >
+                                                        <option value="active">Active</option>
+                                                        <option value="suspended">Suspended</option>
+                                                        <option value="deleted">Deleted</option>
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Pagination controls */}
+                        {filteredUsers.length > ITEMS_PER_PAGE && (
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-slate-200 bg-slate-50/50 text-[11px]">
+                                <div className="text-slate-500 font-medium">
+                                    Showing{" "}
+                                    <span className="font-bold text-slate-800">
+                                        {(currentPage - 1) * ITEMS_PER_PAGE + 1}
+                                    </span>{" "}
+                                    to{" "}
+                                    <span className="font-bold text-slate-800">
+                                        {Math.min(
+                                            currentPage * ITEMS_PER_PAGE,
+                                            filteredUsers.length
+                                        )}
+                                    </span>{" "}
+                                    of{" "}
+                                    <span className="font-bold text-slate-800">
+                                        {filteredUsers.length}
+                                    </span>{" "}
+                                    users
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                                        }
+                                        disabled={currentPage === 1}
+                                        className="px-2 py-1 border border-slate-200 rounded-sm text-[11px] font-semibold text-slate-600 bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50"
+                                    >
+                                        Prev
+                                    </button>
+
+                                    {Array.from({ length: totalPages }).map((_, index) => {
+                                        const page = index + 1;
+                                        const isActive = page === currentPage;
+                                        return (
+                                            <button
+                                                key={page}
+                                                type="button"
+                                                onClick={() => setCurrentPage(page)}
+                                                className={`px-2 py-1 border text-[11px] font-semibold rounded-sm ${
+                                                    isActive
+                                                        ? "bg-emerald-600 border-emerald-600 text-white"
+                                                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                                                }`}
+                                            >
+                                                {page}
+                                            </button>
+                                        );
+                                    })}
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setCurrentPage((prev) =>
+                                                Math.min(prev + 1, totalPages)
+                                            )
+                                        }
+                                        disabled={currentPage === totalPages}
+                                        className="px-2 py-1 border border-slate-200 rounded-sm text-[11px] font-semibold text-slate-600 bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

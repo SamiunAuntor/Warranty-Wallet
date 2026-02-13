@@ -59,8 +59,7 @@ const InvoiceModal = ({ productId, productName, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[130] flex items-center justify-center p-0 sm:p-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-0 sm:p-4">      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"
         onClick={onClose}

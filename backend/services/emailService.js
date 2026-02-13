@@ -120,7 +120,7 @@ async function sendExpiringSoonEmail(userEmail, userName, product, daysRemaining
           </div>
           
           <div style="text-align: center;">
-            <a href="${process.env.FRONTEND_URL || 'https://warranty-wallet-ad400.web.app/'}/dashboard/products" class="cta-button">
+            <a href="${process.env.FRONTEND_URL || 'https://warranty-wallet-ad400.web.app'}/dashboard/products" class="cta-button">
               View Product Details
             </a>
           </div>
@@ -170,10 +170,8 @@ Thank you for using WarrantyWallet!
   try {
     const transporter = getTransporter();
     const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ Email sent to ${userEmail}:`, info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error(`❌ Error sending email to ${userEmail}:`, error);
     throw error;
   }
 }
@@ -195,7 +193,6 @@ async function sendTestEmail(testEmail) {
   try {
     const transporter = getTransporter();
     const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ Test email sent to ${testEmail}:`, info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error(`❌ Error sending test email:`, error);

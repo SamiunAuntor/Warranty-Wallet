@@ -146,9 +146,7 @@ async function processProductStatusTransitionsAndEmails() {
     }
   }
 
-  console.log(
-    `📧 Product reminder scan complete: scanned=${scanned}, statusUpdates=${updatedStatuses}, emailsSent=${emailsSent}, emailFailures=${emailFailures}`
-  );
+
 }
 
 async function processDueReminders() {
@@ -167,16 +165,13 @@ async function processDueReminders() {
 
   if (!dueReminders.length) return;
 
-  console.log(`🔔 Processing ${dueReminders.length} due reminders...`);
 
   for (const reminder of dueReminders) {
     try {
       // In a real system, send email + in-app notification here.
       const product = await products.findOne({ _id: reminder.productId });
 
-      console.log(
-        `Reminder for product "${product?.productName || 'Unknown'}" (${reminder.reminderType})`
-      );
+      
 
       await reminders.updateOne(
         { _id: reminder._id },
@@ -231,13 +226,11 @@ function startDailyReminderJob() {
 
   // Testing: Run every minute
   cron.schedule('* * * * *', () => {
-    console.log('🕘 Running daily reminder check...');
     Promise.all([processProductStatusTransitionsAndEmails(), processDueReminders()]).catch((err) =>
       console.error('Error in daily reminder job:', err)
     );
   });
   
-  console.log('✅ Daily reminder job scheduled (runs every minute for testing)');
 }
 
 module.exports = {

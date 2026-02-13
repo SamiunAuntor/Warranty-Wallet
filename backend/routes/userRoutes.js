@@ -9,7 +9,6 @@ router.post('/', async (req, res) => {
   try {
     const { name, email, photoURL } = req.body;
 
-    console.log('📥 Received user sync request:', { name, email, photoURL: photoURL ? 'provided' : 'not provided' });
 
     if (!name || !email) {
       console.error('❌ Validation failed: name and email are required');
@@ -17,7 +16,6 @@ router.post('/', async (req, res) => {
     }
 
     const users = await getUsersCollection();
-    console.log('✅ Got users collection');
 
     const now = new Date();
 
@@ -38,7 +36,6 @@ router.post('/', async (req, res) => {
       updateDoc.$set.photoURL = photoURL;
     }
 
-    console.log('🔄 Attempting to upsert user with email:', email);
     // Use updateOne + findOne instead of findOneAndUpdate to avoid driver edge cases
     await users.updateOne({ email }, updateDoc, { upsert: true });
 
@@ -49,7 +46,6 @@ router.post('/', async (req, res) => {
       return res.status(500).json({ message: 'Failed to save user' });
     }
 
-    console.log('✅ User successfully saved/updated in database:', userDoc._id);
     return res.status(200).json(userDoc);
   } catch (err) {
     console.error('❌ Error syncing user:', err);

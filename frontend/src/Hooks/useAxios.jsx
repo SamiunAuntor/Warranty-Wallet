@@ -4,7 +4,7 @@ import app from "../Firebase/firebase.config";
 
 // Create a single axios instance for the app
 const baseURL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+    import.meta.env.VITE_API_BASE_URL || "https://warranty-wallet-server.vercel.app";
 
 const axiosInstance = axios.create({
     baseURL,

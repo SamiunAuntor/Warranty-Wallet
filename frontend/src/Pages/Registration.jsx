@@ -23,13 +23,11 @@ const Registration = () => {
 
     const syncUserToBackend = async ({ name, email, photoURL }) => {
         try {
-            console.log('🔄 Syncing user to backend...', { name, email });
             const response = await axiosSecure.post('/api/users', {
                 name,
                 email,
                 photoURL: photoURL || '',
             });
-            console.log('✅ User synced to backend successfully:', response.data);
             return response.data;
         } catch (error) {
             console.error('❌ Failed to sync user to backend:', error);

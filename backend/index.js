@@ -4,6 +4,9 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+require('./firebaseAdmin');
+
+
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
@@ -52,17 +55,19 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Define PORT (Add this line!)
 const PORT = process.env.PORT || 5000;
 
-connectDB()
-  .then(() => {
-    startDailyReminderJob();
+// Start DB connection
+connectDB().catch(err => console.error(err));
+startDailyReminderJob();
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error('Failed to connect to MongoDB', err);
-    process.exit(1);
+// Local Development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   });
+}
+
+// Required for Vercel
+module.exports = app;

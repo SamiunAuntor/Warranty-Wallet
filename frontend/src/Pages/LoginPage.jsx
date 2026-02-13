@@ -19,13 +19,11 @@ const LoginPage = () => {
 
     const syncUserToBackend = async ({ name, email, photoURL }) => {
         try {
-            console.log('🔄 Syncing user to backend...', { name, email });
             const response = await axiosSecure.post('/api/users', {
                 name,
                 email,
                 photoURL: photoURL || '',
             });
-            console.log('✅ User synced to backend successfully:', response.data);
             return response.data;
         } catch (error) {
             console.error('❌ Failed to sync user to backend:', error);
@@ -86,13 +84,10 @@ const LoginPage = () => {
 
             // Check user role and redirect accordingly
             const userRole = await checkUserRole();
-            console.log('🔍 Detected user role:', userRole);
             
             if (userRole === "admin") {
-                console.log('✅ Redirecting admin to /admin');
                 navigate("/admin");
             } else {
-                console.log('✅ Redirecting user to /dashboard');
                 navigate("/dashboard");
             }
         } catch (err) {
@@ -126,13 +121,10 @@ const LoginPage = () => {
 
             // Check user role and redirect accordingly
             const userRole = await checkUserRole();
-            console.log('🔍 Detected user role:', userRole);
             
             if (userRole === "admin") {
-                console.log('✅ Redirecting admin to /admin');
                 navigate("/admin");
             } else {
-                console.log('✅ Redirecting user to /dashboard');
                 navigate("/dashboard");
             }
         } catch (err) {

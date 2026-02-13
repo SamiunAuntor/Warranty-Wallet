@@ -58,6 +58,7 @@ const Navbar = () => {
                                 <button
                                     onClick={handleAvatarClick}
                                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                                    tooltip="Go to Dashboard"
                                 >
                                     {user.photoURL ? (
                                         <img

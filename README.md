@@ -147,6 +147,8 @@ Managing warranties for multiple products is often a chaotic process. Physical i
 ### Services & Integrations
 - **Firebase Authentication** - User auth
 - **MongoDB Atlas** - Cloud database
+- **Vercel** - Backend deployment
+- **Firebase Hosting** - Frontend deployment
 - **ImageBB** - Image hosting
 - **Gmail SMTP** - Email delivery
 
@@ -157,9 +159,8 @@ Managing warranties for multiple products is often a chaotic process. Physical i
 ```
 WarrantyWallet/
 ├── backend/
-│   ├── db.js                    # MongoDB connection & collection helpers
-│   ├── firebaseAdmin.js         # Firebase Admin SDK initialization
-│   ├── index.js                 # Express server entry point
+│   ├── jobs/
+│   │   └── dailyReminderCheck.js # Daily cron job for reminders
 │   ├── middleware/
 │   │   └── authMiddleware.js    # Authentication & authorization
 │   ├── routes/
@@ -172,44 +173,47 @@ WarrantyWallet/
 │   ├── services/
 │   │   ├── emailService.js       # Email sending service
 │   │   └── reminderService.js    # Reminder logic
-│   └── jobs/
-│       └── dailyReminderCheck.js # Daily cron job for reminders
+│   ├── db.js                    # MongoDB connection & collection helpers
+│   ├── firebaseAdmin.js         # Firebase Admin SDK initialization
+│   ├── firebase-key-convert.js  # Utility for Firebase key conversion
+│   ├── index.js                 # Express server entry point
+│   └── vercel.json              # Vercel deployment configuration
 │
 ├── frontend/
 │   ├── src/
 │   │   ├── Components/
-│   │   │   ├── Auth/             # Route guards (PrivateRoute, AdminRoute, PublicRoute)
+│   │   │   ├── Auth/             # Route guards (PrivateRoute, AdminRoute, etc.)
 │   │   │   ├── Dashboard/        # Product management components
-│   │   │   │   ├── InvoiceModal.jsx
-│   │   │   │   ├── ProductDetailsModal.jsx
-│   │   │   │   ├── WarrantyForm.jsx
-│   │   │   │   └── WarrantyList.jsx
-│   │   │   └── ...               # Homepage components
+│   │   │   └── ...               # UI sections (Banner, FAQ, etc.)
+│   │   ├── Firebase/
+│   │   │   ├── AuthProvider.jsx  # Auth context provider
+│   │   │   └── firebase.config.js # Firebase client initialization
 │   │   ├── Hooks/
-│   │   │   ├── useAuth.jsx       # Firebase auth hook
-│   │   │   ├── useAxios.jsx      # Axios instance with auth
-│   │   │   └── useRoles.jsx      # Role management hook
+│   │   │   ├── useAuth.jsx       # Custom auth hook
+│   │   │   ├── useAxios.jsx      # Axios instance with interceptors
+│   │   │   └── useRoles.jsx      # Role detection hook
 │   │   ├── Layouts/
-│   │   │   ├── AdminLayout.jsx   # Admin panel layout
-│   │   │   ├── DashboardLayout.jsx # User dashboard layout
-│   │   │   └── HomeLayout.jsx    # Public pages layout
+│   │   │   ├── AdminLayout.jsx   # Admin panel shell
+│   │   │   ├── DashboardLayout.jsx # User dashboard shell
+│   │   │   └── HomeLayout.jsx    # Public page shell
 │   │   ├── Pages/
 │   │   │   ├── AdminDashboard.jsx
 │   │   │   ├── Dashboard.jsx
+│   │   │   ├── HomePage.jsx
 │   │   │   ├── Products.jsx
 │   │   │   ├── Profile.jsx
-│   │   │   ├── UserManagement.jsx
-│   │   │   └── ...               # Auth pages
-│   │   ├── Router.jsx            # Route configuration
-│   │   └── Utils/
-│   │       ├── alerts.js         # SweetAlert2 utilities
-│   │       ├── authErrorMessages.js
-│   │       └── UploadImage.js    # ImageBB upload utility
-│   └── package.json
+│   │   │   └── ...               # Privacy, Terms, Auth pages
+│   │   ├── Utils/
+│   │   │   ├── alerts.js         # SweetAlert2 helpers
+│   │   │   ├── exportToPDF.js    # PDF generation logic
+│   │   │   └── UploadImage.js    # ImageBB upload service
+│   │   ├── Router.jsx            # Application routing
+│   │   └── main.jsx              # Entry point
+│   ├── firebase.json             # Firebase Hosting config
+│   └── vite.config.js            # Vite configuration
 │
-├── DATABASE_SCHEMA.md            # Complete database schema documentation
+├── DEPLOYMENT_PLAN.md            # Step-by-step deployment guide
 ├── DEVELOPMENT_FLOW.md           # Development roadmap
-├── SECURITY_IMPLEMENTATION.md    # Security documentation
 └── README.md                     # This file
 ```
 

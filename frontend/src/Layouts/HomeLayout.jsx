@@ -1,13 +1,24 @@
 import React, { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { showQueuedToastIfAny } from '../Utils/alerts';
 
 const HomeLayout = () => {
+    const location = useLocation();
+
     useEffect(() => {
         showQueuedToastIfAny();
     }, []);
+
+    // Ensure we land at the top of the page on route changes
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "instant", // change to "smooth" if you prefer
+        });
+    }, [location.pathname]);
 
     return (
         <div className="min-h-screen flex flex-col bg-[#F8FAFC]">

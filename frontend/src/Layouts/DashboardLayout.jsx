@@ -11,6 +11,7 @@ const DashboardLayout = () => {
     const { user, logoutUser } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+    const [mainRef, setMainRef] = useState(null);
 
     const handleLogout = async () => {
         try {
@@ -25,6 +26,23 @@ const DashboardLayout = () => {
     useEffect(() => {
         showQueuedToastIfAny();
     }, []);
+
+    // Ensure we land at the top of the content area on route changes
+    useEffect(() => {
+        if (mainRef) {
+            mainRef.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: "instant", // change to "smooth" if you prefer
+            });
+        } else {
+            window.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: "instant",
+            });
+        }
+    }, [location.pathname, mainRef]);
 
     const menuItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -140,7 +158,10 @@ const DashboardLayout = () => {
 
                 {/* Main Content */}
                 <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-hidden">
-                    <main className="flex-1 p-5 md:p-10 overflow-auto">
+                    <main
+                        ref={setMainRef}
+                        className="flex-1 p-5 md:p-10 overflow-auto"
+                    >
                         <Outlet />
                     </main>
                 </div>

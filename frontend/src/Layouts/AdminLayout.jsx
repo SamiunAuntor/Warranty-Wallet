@@ -37,11 +37,16 @@ const AdminLayout = () => {
                 {/* Mobile Navbar - Fixed at top */}
                 <div className="md:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200 sticky top-0 z-30">
                     <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-black text-slate-800 tracking-tight">
-                            Warranty<span className="text-emerald-600">Wallet</span>
-                        </h2>
-                        <span className="text-xs font-black text-rose-600 uppercase">Admin</span>
+                        <div className="flex flex-col leading-tight">
+                            <h2 className="text-lg font-black text-slate-800 tracking-tight">
+                                Warranty<span className="text-emerald-600">Wallet</span>
+                            </h2>
+                            <span className="text-xs font-black text-rose-600 uppercase">
+                                Admin
+                            </span>
+                        </div>
                     </div>
+
                     <button
                         onClick={() => setSidebarOpen(true)}
                         className="p-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
@@ -74,12 +79,12 @@ const AdminLayout = () => {
                                 {isCollapsed ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
                             </button>
                             {/* Brand name - no icon */}
-                            <div className={`items-center gap-2 ${isCollapsed ? 'md:hidden' : 'flex'}`}>
+                            <div className={`flex flex-col leading-tight ${isCollapsed ? 'md:hidden' : 'flex'}`}>
                                 <h2 className="text-xl font-black text-slate-800 whitespace-nowrap">
                                     Warranty<span className="text-emerald-600">Wallet</span>
                                 </h2>
                                 {!isCollapsed && (
-                                    <span className="text-[10px] font-black text-rose-600 uppercase bg-rose-50 px-2 py-0.5 rounded-sm">Admin</span>
+                                    <span className="text-[12px] text-center font-black text-rose-600 uppercase bg-rose-50 my-1 px-2 py-1 rounded-sm">Admin</span>
                                 )}
                             </div>
                         </div>

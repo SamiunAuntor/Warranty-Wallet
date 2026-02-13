@@ -24,7 +24,7 @@ const HomeStats = () => {
 
     return (
         <div className="bg-white border-y border-slate-200 py-16">
-            <div className="max-w-6xl mx-auto px-6">
+            <div className="w-11/12 mx-auto px-6">
                 {/* Classic Centered Header */}
                 <div className="text-center mb-12">
                     <h2 className="text-sm font-black text-emerald-600 uppercase tracking-[0.2em] mb-3">
@@ -78,7 +78,7 @@ const StatGroup = ({ label, value, isLoading }) => {
                 {label}
             </span>
             {/* Minimalist Accent Line */}
-            <div className="w-6 h-1 bg-emerald-500 mt-2" />
+            <div className="w-10 h-1 bg-emerald-500 mt-2" />
         </div>
     );
 };

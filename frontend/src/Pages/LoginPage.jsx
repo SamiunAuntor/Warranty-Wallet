@@ -5,6 +5,7 @@ import useAuth from '../Hooks/useAuth';
 import useAxios from '../Hooks/useAxios';
 import { queueSuccessToast } from '../Utils/alerts';
 import { getAuthErrorMessage } from '../Utils/authErrorMessages';
+import QuickLogin from '../Components/Auth/QuickLogin';
 
 const LoginPage = () => {
     const [email, setEmail] = useState("");
@@ -56,7 +57,7 @@ const LoginPage = () => {
     };
 
     const handleEmailLogin = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         setError("");
 
         if (!email || !password) {
@@ -83,6 +84,41 @@ const LoginPage = () => {
             );
 
             // Check user role and redirect accordingly
+            const userRole = await checkUserRole();
+            
+            if (userRole === "admin") {
+                navigate("/admin");
+            } else {
+                navigate("/dashboard");
+            }
+        } catch (err) {
+            console.error(err);
+            const message = getAuthErrorMessage(err, 'signing you in');
+            setError(message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleQuickLogin = async (quickEmail, quickPassword) => {
+        setEmail(quickEmail);
+        setPassword(quickPassword);
+        
+        // Use a slight delay to ensure state updates before submission
+        // or just call handleEmailLogin with the values directly
+        setError("");
+        try {
+            setLoading(true);
+            const result = await loginUserWithEmailPassword(quickEmail, quickPassword);
+            const fbUser = result.user;
+
+            await syncUserToBackend({
+                name: fbUser.displayName || "User",
+                email: fbUser.email,
+                photoURL: fbUser.photoURL || "",
+            });
+
+            queueSuccessToast('Welcome back', 'You have successfully signed in.');
             const userRole = await checkUserRole();
             
             if (userRole === "admin") {
@@ -148,6 +184,9 @@ const LoginPage = () => {
                             Securely manage your product protection
                         </p>
                     </div>
+
+                    {/* Quick Login Section */}
+                    <QuickLogin onQuickLogin={handleQuickLogin} disabled={loading} />
 
                     {/* Google Login Button */}
                     <button

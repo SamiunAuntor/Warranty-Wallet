@@ -1,5 +1,7 @@
 # WarrantyWallet
 
+**Live Application:** [https://warranty-wallet-ad400.web.app](https://warranty-wallet-ad400.web.app)
+
 > **Smart Warranty & Claim Reminder System with Admin Management**
 
 WarrantyWallet is a comprehensive web-based platform that helps users digitally manage product warranties, secure purchase documents, and receive intelligent reminders before warranties expire. The system includes an administrative dashboard for managing users and monitoring platform activity while maintaining strict data privacy.
@@ -37,6 +39,7 @@ WarrantyWallet transforms scattered warranty documents into a secure, intelligen
 - ✅ Product categorization
 - ✅ Shop/Seller information tracking
 - ✅ Internal notes and documentation
+- ✅ Export warranty list to PDF with professional formatting
 
 ### 📄 Invoice Management
 - ✅ Multiple invoice image upload (up to 4 images per product)
@@ -125,6 +128,8 @@ WarrantyWallet transforms scattered warranty documents into a secure, intelligen
 - **React Tooltip** - Tooltip component
 - **Swiper** - Image carousel
 - **Typewriter Effect** - Animated text
+- **jsPDF + jsPDF-AutoTable** - PDF document generation
+- **DaisyUI** - Tailwind CSS component library
 
 ### Backend
 - **Node.js** - Runtime environment
